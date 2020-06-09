@@ -1,0 +1,11 @@
+name: hubmap
+channels:
+    - conda-forge
+dependencies:
+    - python >=3.6,<4
+    - pip
+    - openjdk >= 11.0.1
+    - numpy >= 1.18.0
+    - dask >= 2.18.0
+    - tifffile >= 2020.6.3
+    - PyYAML >= 5.3.1

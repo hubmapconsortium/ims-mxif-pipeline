@@ -1,0 +1,47 @@
+#String, Experiment name will be used for naming files and folders
+experiment_name: "VAN0001-RK"
+
+#String, Path to the cytokit container  "eczech/cytokit:latest"
+cytokit_container_path: "/path/to/cytokit_image/"
+
+#String, Path to the cytokit data dir
+cytokit_data_dir: "path/to/cytokit/data/"
+
+#String, Path to immuno-fluorescent data, directory should contain 2 directories processedMicroscopy and rawMicroscopy
+mxif_dataset_dir_path: "/path/to/dataset/"
+
+#Path to imaging mass spectrometry OME-TIFF files
+
+#String or null, If IMS data is split into positive and negative datasets, provide path to each file
+multichannel_ims_ometiff_positive_path: null
+#String or null
+multichannel_ims_ometiff_negative_path: null
+
+#String or null, If positive and negative datasets are combined in one OME-TIFF file, provide them here instead
+multichannel_ims_ometiff_combined_path: null
+
+#String
+output_dir_path: "/path/to/output/"
+
+
+#Integer, Number of gpus to use
+ngpus: 1
+
+#String or null, If data has multiple z-planes, specify channel to use for detecting best focused plane
+best_focus_channel: null
+
+#String, Channel that will be used for nucleus segmentation
+nuclei_channel: "DAPI"
+
+#String or null, Channel that will be used for cell membrane segmentation
+#if none is provided membrane will be estimated from nucleus segmentation
+membrane_channel: null
+
+#String or null, Channel to do registration between cycles, format: Cyc1_reg1_DAPI
+drift_compensation_channel: null
+
+#Integer, size of one tile for image segmentation
+block_size: 1000
+
+#Integer, size of overlap for one edge (each image has 4 overlapping edges)
+overlap: 20
