@@ -1,5 +1,6 @@
 import argparse
-
+import os
+import os.path as osp
 import yaml
 
 import combine_mxif
@@ -12,6 +13,10 @@ def main(pipeline_config: str):
     pipeline_meta = config['pipeline_meta']
     mxif_data_paths = pipeline_meta['mxif_data_paths']
     mxif_combined_out_path = pipeline_meta['mxif_combined_out_path']
+
+    if not osp.exists('pipeline_output'):
+        os.makedirs('pipeline_output')
+
     combine_mxif.main(mxif_data_paths, mxif_combined_out_path)
 
 

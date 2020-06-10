@@ -11,7 +11,7 @@ inputs:
       prefix: "--pipeline_config"
 
 outputs:
-  slicer_out_path:
-    type: File
+  slicer_out_dir:
+    type: Directory
     outputBinding:
-      glob: slicer_out_path.yaml
+      glob: "images/Cyc?_reg?"

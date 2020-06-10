@@ -11,7 +11,7 @@ inputs:
       prefix: "--pipeline_config"
 
   cytokit_out_dir:
-    type: File
+    type: Directory
     inputBinding:
       prefix: "--cytokit_out_dir"
 

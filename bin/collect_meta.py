@@ -200,7 +200,7 @@ def save_extracted_ome_meta(output_path: str, meta: dict):
 
 
 def main(path_to_submission_file: str, base_pipeline_dir: str, pipeline_output_dir:str, pipeline_config_path: str,
-         cytokit_container_path: str, cytokit_out_dir: str, cytokit_data_dir: str, conda_init_path: str,
+         cytokit_container_path: str, cytokit_output_dir: str, cytokit_data_dir: str, conda_init_path: str,
          cytokit_config_path: str, path_to_external_output_directory: str):
 
     with open(path_to_submission_file, 'r') as s:
@@ -262,11 +262,13 @@ def main(path_to_submission_file: str, base_pipeline_dir: str, pipeline_output_d
     # TODO change for next release
 
     mxif_data_paths = []
-    total_cycles = max(list(per_cycle_info.keys()))
-    for i in range(0, total_cycles):
-        this_cycle_info = per_cycle_info[cycle]
-        proc_img_path = this_cycle_info[region]['proc_path']
-        mxif_data_paths.append(proc_img_path)
+    total_cycles = list(per_cycle_info.keys())
+    for c in total_cycles:
+        this_cycle_info = per_cycle_info[c]
+        regions = list(this_cycle_info.keys())
+        for r in regions:
+            proc_img_path = this_cycle_info[r]['proc_path']
+            mxif_data_paths.append(proc_img_path)
 
     remove_keys = ['image_name', 'cycle', 'region']
     general_slicer_meta = {key: val for key, val in slicer_meta.items() if key not in remove_keys}
@@ -277,7 +279,7 @@ def main(path_to_submission_file: str, base_pipeline_dir: str, pipeline_output_d
     general_ome_meta['emission_wavelengths'] = [extracted_ome_meta['emission_wavelengths'][0]]  # take first value and put in the list
 
     experiment_name = submission['experiment_name']
-    cytokit_output_masks = osp.join(cytokit_out_dir, 'cytometry', 'tile')
+    cytokit_output_masks = osp.join(cytokit_output_dir, 'cytometry', 'tile')
     stitcher_out_path = osp.join(pipeline_output_dir, experiment_name + '_segmentation_mask_stitched.ome.tiff')
     ims_combined_out_path = osp.join(pipeline_output_dir, experiment_name + '_ims_combined_multilayer.ome.tiff')
     mxif_combined_out_path = osp.join(pipeline_output_dir, experiment_name + '_mxif_combined_multilayer.ome.tiff')
@@ -292,7 +294,7 @@ def main(path_to_submission_file: str, base_pipeline_dir: str, pipeline_output_d
                      'extracted_ome_meta_path': extracted_ome_meta_path,
                      'stitcher_in_path': cytokit_output_masks,
                      'stitcher_out_path': stitcher_out_path,
-                     'cytokit_out_dir': cytokit_out_dir,
+                     'cytokit_output_dir': cytokit_output_dir,
                      'cytokit_data_dir': cytokit_data_dir,
                      'cytokit_container_path': cytokit_container_path,
                      'conda_init_path': conda_init_path,
@@ -320,7 +322,7 @@ if __name__ == '__main__':
     parser.add_argument('--pipeline_output_dir', type=str, help='directory to output pipeline results')
     parser.add_argument('--pipeline_config_path', type=str, help='path to output collected pipeline metadata')
     parser.add_argument('--cytokit_container_path', type=str, help='path to cytokit container')
-    parser.add_argument('--cytokit_out_dir', type=str, help='path to cytokit output directory')
+    parser.add_argument('--cytokit_output_dir', type=str, help='path to cytokit output directory')
     parser.add_argument('--cytokit_data_dir', type=str, help='path to cytokit data directory')
     parser.add_argument('--conda_init_path', type=str, help='path to file that initiates conda shell')
     parser.add_argument('--cytokit_config_path', type=str, help='path to cytokit config file')
@@ -328,5 +330,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args.path_to_submission_file, args.base_pipeline_dir, args.pipeline_output_dir, args.pipeline_config_path,
-         args.cytokit_container_path, args.cytokit_out_dir, args.cytokit_data_dir, args.conda_init_path,
+         args.cytokit_container_path, args.cytokit_output_dir, args.cytokit_data_dir, args.conda_init_path,
          args.cytokit_config_path, args.path_to_external_output_directory)

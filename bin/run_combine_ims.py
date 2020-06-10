@@ -1,6 +1,8 @@
 import argparse
 import shutil
 import yaml
+import os
+import os.path as osp
 
 import combine_ims
 
@@ -15,6 +17,9 @@ def main(pipeline_config: str):
     ims_pos_path = submission['multichannel_ims_ometiff_positive_path']
     ims_neg_path = submission['multichannel_ims_ometiff_negative_path']
     ims_combined_out_path = pipeline_meta['ims_combined_out_path']
+
+    if not osp.exists('pipeline_output'):
+        os.makedirs('pipeline_output')
 
     # Will run combine_ims.py if both positive and negative paths are provided
     # Otherwise will just copy file to output folder

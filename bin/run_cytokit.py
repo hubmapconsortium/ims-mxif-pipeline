@@ -14,8 +14,10 @@ def read_from_pipeline_config(pipeline_config):
     return meta
 
 
-def main(pipeline_config):
+def main(pipeline_config: str, slicer_out_dir: str):
     meta = read_from_pipeline_config(pipeline_config)
+    if not osp.exists('cytokit_output'):
+        os.makedirs('cytokit_output')
 
     cytokit_run_cmd = ('singularity exec --nv ' +
                        '-B {cytokit_data_dir}:/lab/data/ ' +
@@ -29,8 +31,8 @@ def main(pipeline_config):
                        '--data-dir /lab/slices/ --config-path {cytokit_config_path} --output-dir /lab/output/" ')
 
     run_cytokit = cytokit_run_cmd.format(cytokit_data_dir=meta['cytokit_data_dir'],
-                                         input_dir=meta['slicer_out_path'],
-                                         output_dir=meta['cytokit_out_dir'],
+                                         input_dir=slicer_out_dir,
+                                         output_dir='cytokit_output',
                                          cytokit_container_path=meta['cytokit_container_path'],
                                          conda_init_path=meta['conda_init_path'],
                                          cytokit_config_path=meta['cytokit_config_path'])
@@ -42,14 +44,12 @@ def main(pipeline_config):
     res.stdout
     res.stderr
     """
-    with open(osp.join(os.getcwd(), 'cytokit_out_dir.yaml'), 'w') as s:
-        yaml.safe_dump({'cytokit_out_dir': meta['cytokit_out_dir']}, stream=s, default_flow_style=False, indent=4, sort_keys=False)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--pipeline_config', type=str, help='path to pipeline config')
-    parser.add_argument('--slicer_out_path', type=str, help='path to slicer output')
+    parser.add_argument('--slicer_out_dir', type=str, help='path to slicer output')
     # parser.add_argument('--img_dir', type=str, help="path to directory with image tiles")
     # parser.add_argument('--output_dir', type=str, help="path to directory where output will be stored")
     # parser.add_argument('--cytokit_data_dir', type=str, help="path to directory where cytokit stores runtime data")
@@ -58,4 +58,4 @@ if __name__ == '__main__':
     # parser.add_argument('--cytokit_config_path', type=str, help="path to cytokit config file (experiment.yaml)")
     args = parser.parse_args()
 
-    main(args.pipeline_config)
+    main(args.pipeline_config, args.slicer_out_dir)

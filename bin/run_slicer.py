@@ -26,10 +26,6 @@ def main(pipeline_config: str):
     slicer.main(i=in_path, o=out_base_dir, s=int(block_shape), n=0, v=int(overlap), c=1, r=1,
                 nz=int(num_z_planes), nc=int(num_cycles))
 
-    print(os.getcwd())
-    with open(osp.join(os.getcwd(), 'slicer_out_path.yaml'), 'w') as s:
-        yaml.safe_dump({"slicer_out": out_base_dir}, stream=s, default_flow_style=False, indent=4, sort_keys=False)
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

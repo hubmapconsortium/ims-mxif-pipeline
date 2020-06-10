@@ -1,6 +1,3 @@
 submission_file:
   class: File
-  path: "/path/to/file"
-output_directory:
-  class: Directory
-  path: "/path/to/directory"
+  path: "/path/to/sample_submission.yaml"

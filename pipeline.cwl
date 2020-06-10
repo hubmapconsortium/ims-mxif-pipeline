@@ -7,8 +7,7 @@ class: Workflow
 inputs:
   - id: submission_file
     type: File
-  - id: output_directory
-    type: Directory
+
 
 steps:
   - id: initiate_pipeline
@@ -28,14 +27,14 @@ steps:
         source: initiate_pipeline/pipeline_config
     run: steps/run_slicer.cwl
     out:
-      - id: slicer_out_path
+      - id: slicer_out_dir
 
   - id: run_cytokit
     in:
       - id: pipeline_config
         source: initiate_pipeline/pipeline_config
-      - id: slicer_out_path
-        source: run_slicer/slicer_out_path
+      - id: slicer_out_dir
+        source: run_slicer/slicer_out_dir
     run: steps/run_cytokit.cwl
     out:
       - id: cytokit_out_dir

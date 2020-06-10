@@ -12,7 +12,7 @@ import generate_cytokit_config
 def create_base_dirs(out_dir: str):
     dir_paths = dict(meta_dir=osp.join(out_dir, 'meta'),
                      images_dir=osp.join(out_dir, 'images'),
-                     cytokit_out_dir=osp.join(out_dir, 'cytokit_output'),
+                     cytokit_output_dir=osp.join(out_dir, 'cytokit_output'),
                      cytokit_data_dir=osp.join(out_dir, 'cytokit_data'),
                      pipeline_output_dir=osp.join(out_dir, 'pipeline_output')
                      )
@@ -36,12 +36,12 @@ def main(path_to_submission_file: str, path_to_external_output_directory: str):
     pipeline_output_dir = dir_paths['pipeline_output_dir']
     cytokit_container_path = submission['cytokit_container_path']
     cytokit_data_dir = submission['cytokit_data_dir']
-    cytokit_out_dir = dir_paths['cytokit_out_dir']
+    cytokit_output_dir = dir_paths['cytokit_output_dir']
     conda_init_path = osp.join(__location__, 'conda_init.sh')
     cytokit_config_path = osp.join(dir_paths['pipeline_output_dir'], 'cytokit_config.yaml')
 
     collect_meta.main(path_to_submission_file, base_pipeline_dir, pipeline_output_dir, pipeline_config_path,
-                      cytokit_container_path, cytokit_out_dir, cytokit_data_dir, conda_init_path, cytokit_config_path,
+                      cytokit_container_path, cytokit_output_dir, cytokit_data_dir, conda_init_path, cytokit_config_path,
                       path_to_external_output_directory)
 
     generate_cytokit_config.main(pipeline_config_path, cytokit_config_path)

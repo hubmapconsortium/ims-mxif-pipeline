@@ -1,20 +1,24 @@
 import argparse
+import os
+import os.path as osp
 
 import yaml
 
 import stitcher
 
 
-def main(pipeline_config: str):
+def main(pipeline_config: str, cytokit_out_dir: str):
     with open(pipeline_config, 'r') as s:
         config = yaml.safe_load(s)
     slicer_meta = config['slicer_meta']
-    pipeline_meta = config['pipeline_meta']
+    submission = config['submission']
+
+    if not osp.exists('pipeline_output'):
+        os.makedirs('pipeline_output')
 
     overlap = int(slicer_meta['overlap']['x'] // 2)
     padding = ','.join(list(slicer_meta['padding'].values()))
-    cytokit_out_dir = pipeline_meta['cytokit_out_dir']
-    stitcher_out_path = pipeline_meta['stitcher_out_path']
+    stitcher_out_path = osp.join('./pipeline_output', submission['experiment_name'] + '_segmentation_mask_stitched.ome.tiff')
     stitcher.main(cytokit_out_dir, stitcher_out_path, overlap, padding)
 
 
@@ -24,4 +28,4 @@ if __name__ == '__main__':
     parser.add_argument('--cytokit_out_dir', type=str, help='path to cytokit output mask')
     args = parser.parse_args()
 
-    main(args.pipeline_config)
+    main(args.pipeline_config, args.cytokit_out_dir)

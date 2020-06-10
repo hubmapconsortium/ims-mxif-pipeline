@@ -1,8 +1,8 @@
 #String, Experiment name will be used for naming files and folders
 experiment_name: "VAN0001-RK"
 
-#String, Path to the cytokit container  "eczech/cytokit:latest"
-cytokit_container_path: "/path/to/cytokit_image/"
+#String, Path to the cytokit container  "docker://eczech/cytokit:latest"
+cytokit_container_path: "/path/to/cytokit_container/"
 
 #String, Path to the cytokit data dir
 cytokit_data_dir: "path/to/cytokit/data/"

@@ -9,13 +9,13 @@ inputs:
     type: File
     inputBinding:
       prefix: "--pipeline_config"
-  slicer_out_path:
-    type: File
+  slicer_out_dir:
+    type: Directory
     inputBinding:
-      prefix: "--slicer_out_path"
+      prefix: "--slicer_out_dir"
 
 outputs:
   cytokit_out_dir:
-    type: File
+    type: Directory
     outputBinding:
-      glob: cytokit_out_dir.yaml
+      glob: cytokit_output
