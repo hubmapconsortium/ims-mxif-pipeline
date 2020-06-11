@@ -9,10 +9,17 @@ inputs:
     type: File
     inputBinding:
       prefix: "--pipeline_config"
+
+  cytokit_config:
+    type: File
+    inputBinding:
+      prefix: "--cytokit_config"
+
   slicer_out_dir:
     type: Directory
     inputBinding:
       prefix: "--slicer_out_dir"
+
 
 outputs:
   cytokit_out_dir:

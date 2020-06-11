@@ -10,10 +10,6 @@ inputs:
     inputBinding:
       prefix: "--path_to_submission_file"
 
-  external_output_dir:
-    type: Directory
-    inputBinding:
-      prefix: "--path_to_external_output_directory"
 
 outputs:
   pipeline_config:

@@ -2,6 +2,7 @@ import os
 import os.path as osp
 import argparse
 import subprocess
+import shutil
 
 import yaml
 
@@ -14,10 +15,11 @@ def read_from_pipeline_config(pipeline_config):
     return meta
 
 
-def main(pipeline_config: str, slicer_out_dir: str):
+def main(pipeline_config: str, cytokit_config: str, slicer_out_dir: str):
     meta = read_from_pipeline_config(pipeline_config)
     if not osp.exists('cytokit_output'):
         os.makedirs('cytokit_output')
+    shutil.copy(cytokit_config, '.')
 
     cytokit_run_cmd = ('singularity exec --nv ' +
                        '-B {cytokit_data_dir}:/lab/data/ ' +
@@ -35,7 +37,7 @@ def main(pipeline_config: str, slicer_out_dir: str):
                                          output_dir='cytokit_output',
                                          cytokit_container_path=meta['cytokit_container_path'],
                                          conda_init_path=meta['conda_init_path'],
-                                         cytokit_config_path=meta['cytokit_config_path'])
+                                         cytokit_config_path='cytokit_config.yaml')
 
     res = subprocess.run(run_cytokit, shell=True, check=True)
 
@@ -49,6 +51,7 @@ def main(pipeline_config: str, slicer_out_dir: str):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--pipeline_config', type=str, help='path to pipeline config')
+    parser.add_argument('--cytokit_config', type=str, help='path to cytokit config')
     parser.add_argument('--slicer_out_dir', type=str, help='path to slicer output')
     # parser.add_argument('--img_dir', type=str, help="path to directory with image tiles")
     # parser.add_argument('--output_dir', type=str, help="path to directory where output will be stored")
@@ -58,4 +61,4 @@ if __name__ == '__main__':
     # parser.add_argument('--cytokit_config_path', type=str, help="path to cytokit config file (experiment.yaml)")
     args = parser.parse_args()
 
-    main(args.pipeline_config, args.slicer_out_dir)
+    main(args.pipeline_config, args.cytokit_config, args.slicer_out_dir)

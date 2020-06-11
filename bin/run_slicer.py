@@ -23,7 +23,7 @@ def main(pipeline_config: str):
     block_shape = slicer_meta['block_shape_no_overlap']['x']
     overlap = slicer_meta['overlap']['x']
 
-    slicer.main(i=in_path, o=out_base_dir, s=int(block_shape), n=0, v=int(overlap), c=1, r=1,
+    slicer.main(i=in_path, o=out_base_dir, s=int(block_shape), n=0, v=int(overlap)//2, c=1, r=1,
                 nz=int(num_z_planes), nc=int(num_cycles))
 
 

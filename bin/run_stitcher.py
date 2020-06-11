@@ -15,11 +15,11 @@ def main(pipeline_config: str, cytokit_out_dir: str):
 
     if not osp.exists('pipeline_output'):
         os.makedirs('pipeline_output')
-
+    tiles = osp.join(cytokit_out_dir, 'cytometry', 'tile')
     overlap = int(slicer_meta['overlap']['x'] // 2)
     padding = ','.join(list(slicer_meta['padding'].values()))
-    stitcher_out_path = osp.join('./pipeline_output', submission['experiment_name'] + '_segmentation_mask_stitched.ome.tiff')
-    stitcher.main(cytokit_out_dir, stitcher_out_path, overlap, padding)
+    stitcher_out_path = osp.join('pipeline_output', submission['experiment_name'] + '_segmentation_mask_stitched.ome.tiff')
+    stitcher.main(tiles, stitcher_out_path, overlap, padding)
 
 
 if __name__ == '__main__':

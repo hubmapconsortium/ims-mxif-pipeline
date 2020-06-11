@@ -33,6 +33,8 @@ steps:
     in:
       - id: pipeline_config
         source: initiate_pipeline/pipeline_config
+      - id: cytokit_config
+        source: initiate_pipeline/cytokit_config
       - id: slicer_out_dir
         source: run_slicer/slicer_out_dir
     run: steps/run_cytokit.cwl

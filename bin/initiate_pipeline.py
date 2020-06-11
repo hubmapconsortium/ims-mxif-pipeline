@@ -23,7 +23,7 @@ def create_base_dirs(out_dir: str):
     return dir_paths
 
 
-def main(path_to_submission_file: str, path_to_external_output_directory: str):
+def main(path_to_submission_file: str):
     __location__ = osp.realpath(osp.join(os.getcwd(), osp.dirname(__file__)))
 
     with open(path_to_submission_file, 'r') as f:
@@ -41,8 +41,7 @@ def main(path_to_submission_file: str, path_to_external_output_directory: str):
     cytokit_config_path = osp.join(dir_paths['pipeline_output_dir'], 'cytokit_config.yaml')
 
     collect_meta.main(path_to_submission_file, base_pipeline_dir, pipeline_output_dir, pipeline_config_path,
-                      cytokit_container_path, cytokit_output_dir, cytokit_data_dir, conda_init_path, cytokit_config_path,
-                      path_to_external_output_directory)
+                      cytokit_container_path, cytokit_output_dir, cytokit_data_dir, conda_init_path, cytokit_config_path)
 
     generate_cytokit_config.main(pipeline_config_path, cytokit_config_path)
 
@@ -53,7 +52,6 @@ def main(path_to_submission_file: str, path_to_external_output_directory: str):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--path_to_submission_file', type=str, help='path to submission file')
-    parser.add_argument('--path_to_external_output_directory', type=str, help='path_to_external_output_directory')
 
     args = parser.parse_args()
-    main(args.path_to_submission_file, args.path_to_external_output_directory)
+    main(args.path_to_submission_file)

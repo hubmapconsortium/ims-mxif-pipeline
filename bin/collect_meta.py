@@ -201,7 +201,7 @@ def save_extracted_ome_meta(output_path: str, meta: dict):
 
 def main(path_to_submission_file: str, base_pipeline_dir: str, pipeline_output_dir:str, pipeline_config_path: str,
          cytokit_container_path: str, cytokit_output_dir: str, cytokit_data_dir: str, conda_init_path: str,
-         cytokit_config_path: str, path_to_external_output_directory: str):
+         cytokit_config_path: str):
 
     with open(path_to_submission_file, 'r') as s:
         submission = yaml.safe_load(s)
@@ -287,7 +287,6 @@ def main(path_to_submission_file: str, base_pipeline_dir: str, pipeline_output_d
     pipeline_meta = {'num_cycles': ncycles,
                      'num_regions': nregions,
                      'pipeline_output_dir': pipeline_output_dir,
-                     'path_to_external_output_directory': path_to_external_output_directory,
                      'slicer_in_path': proc_img_path,
                      'slicer_out_path': images_output_dir,
                      'slicer_meta_path': slicer_meta_path,
@@ -326,9 +325,8 @@ if __name__ == '__main__':
     parser.add_argument('--cytokit_data_dir', type=str, help='path to cytokit data directory')
     parser.add_argument('--conda_init_path', type=str, help='path to file that initiates conda shell')
     parser.add_argument('--cytokit_config_path', type=str, help='path to cytokit config file')
-    parser.add_argument('--path_to_external_output_directory', type=str, help='path_to_external_output_directory')
     args = parser.parse_args()
 
     main(args.path_to_submission_file, args.base_pipeline_dir, args.pipeline_output_dir, args.pipeline_config_path,
          args.cytokit_container_path, args.cytokit_output_dir, args.cytokit_data_dir, args.conda_init_path,
-         args.cytokit_config_path, args.path_to_external_output_directory)
+         args.cytokit_config_path)

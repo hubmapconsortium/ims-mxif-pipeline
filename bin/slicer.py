@@ -265,10 +265,10 @@ if __name__ == '__main__':
     parser.add_argument('-n', type=int, default=0,
                         help='number of blocks, default 0, if set to 0, then -s parameter used instead')
     parser.add_argument('-v', type=int, default=0, help='size of overlap, default 0 (no overlap)')
-    parser.add_argument('--cycle', type=int, default='1', help='cycle number, default 1')
-    parser.add_argument('--region', type=int, default='1', help='region number, default 1')
-    parser.add_argument('--nzplanes', type=int, default='1', help='number of z-planes, default 1')
-    parser.add_argument('--nchannels', type=int, default='1', help='number of channels, default 1')
+    parser.add_argument('--cycle', type=int, default=1, help='cycle number, default 1')
+    parser.add_argument('--region', type=int, default=1, help='region number, default 1')
+    parser.add_argument('--nzplanes', type=int, default=1, help='number of z-planes, default 1')
+    parser.add_argument('--nchannels', type=int, default=1, help='number of channels, default 1')
 
     args = parser.parse_args()
     main(i=args.i, o=args.o, s=args.s, n=args.n, v=args.v, c=args.cycle, r=args.region, nz=args.nzplanes,
