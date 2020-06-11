@@ -14,8 +14,6 @@ steps:
     in:
       - id: submission
         source: submission_file
-      - id: external_output_dir
-        source: output_directory
     run: steps/initiate_pipeline.cwl
     out:
       - id: cytokit_config
