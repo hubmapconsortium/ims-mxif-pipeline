@@ -2,7 +2,7 @@
 
 cwlVersion: v1.0
 class: CommandLineTool
-baseCommand: ["python", "ims_pipeline/bin/run_combine_mxif.py"]
+baseCommand: ["python", "/opt/ims_pipeline/bin/run_combine_mxif.py"]
 
 inputs:
   pipeline_config:

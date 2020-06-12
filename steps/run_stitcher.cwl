@@ -2,7 +2,7 @@
 
 cwlVersion: v1.0
 class: CommandLineTool
-baseCommand: ["python", "ims_pipeline/bin/run_stitcher.py"]
+baseCommand: ["python", "/opt/ims_pipeline/bin/run_stitcher.py"]
 
 inputs:
   pipeline_config:
