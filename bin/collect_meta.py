@@ -208,7 +208,7 @@ def main(path_to_submission_file: str, base_pipeline_dir: str, pipeline_output_d
 
     block_size = submission['block_size']
     overlap = submission['overlap']
-    base_input_dir = submission['if_dataset_dir_path']
+    base_input_dir = submission['mxif_dataset_dir_path']
 
     proc_micro_files, raw_micro_files = get_file_locations(base_input_dir)
     per_cycle_info = arrange_by_cycle(proc_micro_files, raw_micro_files)
