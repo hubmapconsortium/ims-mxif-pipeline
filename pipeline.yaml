@@ -1,3 +1,0 @@
-submission_file:
-  class: File
-  path: "/path/to/sample_submission.yaml"
