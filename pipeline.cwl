@@ -5,9 +5,29 @@ class: Workflow
 
 
 inputs:
-  - id: submission_file
+  - id: cytokit_container_path
+    type: File
+  - id: cytokit_data_dir
+    type: Directory
+  - id: mxif_dataset_dir_path
+    type: Directory
+  - id: multichannel_ims_ometiff_positive_path
+    type: File
+  - id: multichannel_ims_ometiff_negative_path
     type: File
 
+  - id: ngpus
+    type: int
+  - id: best_focus_channel
+    type: Any
+  - id: nuclei_channel
+    type: string
+  - id: membrane_channel
+    type: Any
+  - id: block_size
+    type: int
+  - id: overlap
+    type: int
 
 steps:
   - id: initiate_pipeline

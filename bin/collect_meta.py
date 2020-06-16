@@ -199,12 +199,9 @@ def save_extracted_ome_meta(output_path: str, meta: dict):
         yaml.safe_dump(meta, stream=s, default_flow_style=False, indent=4, sort_keys=False)
 
 
-def main(path_to_submission_file: str, base_pipeline_dir: str, pipeline_output_dir:str, pipeline_config_path: str,
+def main(submission: dict, base_pipeline_dir: str, pipeline_output_dir:str, pipeline_config_path: str,
          cytokit_container_path: str, cytokit_output_dir: str, cytokit_data_dir: str, conda_init_path: str,
          cytokit_config_path: str):
-
-    with open(path_to_submission_file, 'r') as s:
-        submission = yaml.safe_load(s)
 
     block_size = submission['block_size']
     overlap = submission['overlap']
@@ -316,7 +313,7 @@ def main(path_to_submission_file: str, base_pipeline_dir: str, pipeline_output_d
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--path_to_submission_file', type=str, help='path to pipeline submission file')
+    parser.add_argument('--submission', type=yaml.safe_load, help='data from submission file')
     parser.add_argument('--base_pipeline_dir', type=str, help='base pipeline directory')
     parser.add_argument('--pipeline_output_dir', type=str, help='directory to output pipeline results')
     parser.add_argument('--pipeline_config_path', type=str, help='path to output collected pipeline metadata')
@@ -327,6 +324,6 @@ if __name__ == '__main__':
     parser.add_argument('--cytokit_config_path', type=str, help='path to cytokit config file')
     args = parser.parse_args()
 
-    main(args.path_to_submission_file, args.base_pipeline_dir, args.pipeline_output_dir, args.pipeline_config_path,
+    main(args.submission, args.base_pipeline_dir, args.pipeline_output_dir, args.pipeline_config_path,
          args.cytokit_container_path, args.cytokit_output_dir, args.cytokit_data_dir, args.conda_init_path,
          args.cytokit_config_path)

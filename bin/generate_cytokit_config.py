@@ -36,13 +36,13 @@ def generate_processor_meta(acquisition_meta: dict, submission: dict):
     best_focus_channel = submission['best_focus_channel']
     drift_compensation_channel = submission['drift_compensation_channel']
     nuclei_channel = submission['nuclei_channel']
+    run_drift_comp = False
+    drift_compensation = {}
 
-    if drift_compensation_channel is not None:
-        run_drift_comp = True
-        drift_compensation = {'drift_compensation': {'channel': drift_compensation_channel}}
-    else:
-        run_drift_comp = False
-        drift_compensation = {}
+    # if drift_compensation_channel is not None:
+    #     run_drift_comp = True
+    #     drift_compensation = {'drift_compensation': {'channel': drift_compensation_channel}}
+
     if num_z_planes > 1:
         run_best_focus = True
         best_focus = {'best_focus': {'channel':  best_focus_channel}}

@@ -2,26 +2,29 @@
 experiment_name: "VAN0001-RK"
 
 #String, Path to the cytokit container  "docker://eczech/cytokit:latest"
-cytokit_container_path: "/path/to/cytokit_container/"
+cytokit_container_path:
+  class: File
+  path: "/path/to/cytokit_container/"
 
 #String, Path to the cytokit data dir
-cytokit_data_dir: "path/to/cytokit/data/"
+cytokit_data_dir:
+  class: Directory
+  path: "path/to/cytokit/data/"
 
 #String, Path to immuno-fluorescent data, directory should contain 2 directories processedMicroscopy and rawMicroscopy
-mxif_dataset_dir_path: "/path/to/dataset/"
+mxif_dataset_dir_path:
+  class: Directory
+  path: "/path/to/mxif_dataset/"
 
-#Path to imaging mass spectrometry OME-TIFF files
 
-#String or null, If IMS data is split into positive and negative datasets, provide path to each file
-multichannel_ims_ometiff_positive_path: null
-#String or null
-multichannel_ims_ometiff_negative_path: null
+#String, Path to imaging mass spectrometry OME-TIFF positive and negative files
+multichannel_ims_ometiff_positive_path:
+  class: File
+  path: "/path/to/ims_posmode.ome.tiff/"
 
-#String or null, If positive and negative datasets are combined in one OME-TIFF file, provide them here instead
-multichannel_ims_ometiff_combined_path: null
-
-#String
-output_dir_path: "/path/to/output/"
+multichannel_ims_ometiff_negative_path:
+  class: File
+  path: "/path/to/ims_negmode.ome.tiff/"
 
 
 #Integer, Number of gpus to use
@@ -36,9 +39,6 @@ nuclei_channel: "DAPI"
 #String or null, Channel that will be used for cell membrane segmentation
 #if none is provided membrane will be estimated from nucleus segmentation
 membrane_channel: null
-
-#String or null, Channel to do registration between cycles, format: Cyc1_reg1_DAPI
-drift_compensation_channel: null
 
 #Integer, size of one tile for image segmentation
 block_size: 1000
