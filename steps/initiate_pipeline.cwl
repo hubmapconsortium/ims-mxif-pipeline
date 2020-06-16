@@ -62,9 +62,9 @@ outputs:
   pipeline_config:
     type: File
     outputBinding:
-      glob: pipeline_config.yaml
+      glob: './pipeline_output/pipeline_config.yaml'
 
   cytokit_config:
     type: File
     outputBinding:
-      glob: cytokit_config.yaml
+      glob: './pipeline_output/cytokit_config.yaml'

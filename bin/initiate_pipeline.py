@@ -58,9 +58,6 @@ def main(epxeriment_name, cytokit_container_path, cytokit_data_dir, mxif_dataset
 
     generate_cytokit_config.main(pipeline_config_path, cytokit_config_path)
 
-    shutil.copy(pipeline_config_path, '.')
-    shutil.copy(cytokit_config_path, '.')
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -79,7 +76,7 @@ if __name__ == '__main__':
     parser.add_argument('--nuclei_channel', type=str, help='Channel that will be used for nucleus segmentation')
     parser.add_argument('--membrane_channel', type=str, help='Channel that will be used for cell membrane segmentation')
     parser.add_argument('--block_size', type=int, help='size of one tile for image segmentation')
-    parser.add_argument('--overlap', type=str, help='ize of overlap for one edge (each image has 4 overlapping edges)')
+    parser.add_argument('--overlap', type=int, help='size of overlap for one edge (each image has 4 overlapping edges)')
     args = parser.parse_args()
 
     main(args.experiment_name, args.cytokit_container_path, args.cytokit_data_dir, args.mxif_dataset_dir_path,
