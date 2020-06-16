@@ -30,15 +30,15 @@ multichannel_ims_ometiff_negative_path:
 #Integer, Number of gpus to use
 ngpus: 1
 
-#String or null, If data has multiple z-planes, specify channel to use for detecting best focused plane
-best_focus_channel: null
+#String or "None", If data has multiple z-planes, specify channel to use for detecting best focused plane
+best_focus_channel: "None"
 
 #String, Channel that will be used for nucleus segmentation
 nuclei_channel: "DAPI"
 
-#String or null, Channel that will be used for cell membrane segmentation
+#String or "None", Channel that will be used for cell membrane segmentation
 #if none is provided membrane will be estimated from nucleus segmentation
-membrane_channel: null
+membrane_channel: "None"
 
 #Integer, size of one tile for image segmentation
 block_size: 1000

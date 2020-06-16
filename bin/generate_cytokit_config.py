@@ -43,7 +43,7 @@ def generate_processor_meta(acquisition_meta: dict, submission: dict):
     #     run_drift_comp = True
     #     drift_compensation = {'drift_compensation': {'channel': drift_compensation_channel}}
 
-    if num_z_planes > 1:
+    if num_z_planes > 1 and best_focus_channel.lower() != 'none':
         run_best_focus = True
         best_focus = {'best_focus': {'channel':  best_focus_channel}}
         z_plane = 'best'

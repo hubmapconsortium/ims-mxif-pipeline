@@ -34,8 +34,31 @@ inputs:
 steps:
   - id: initiate_pipeline
     in:
-      - id: submission
-        source: submission_file
+      - id: experiment_name
+        source: experiment_name
+      - id: cytokit_container_path
+        source: cytokit_container_path
+      - id: cytokit_data_dir
+        source: cytokit_data_dir
+      - id: mxif_dataset_dir_path
+        source: mxif_dataset_dir_path
+      - id: multichannel_ims_ometiff_positive_path
+        source: multichannel_ims_ometiff_positive_path
+      - id: multichannel_ims_ometiff_negative_path
+        source: multichannel_ims_ometiff_negative_path
+
+      - id: ngpus
+        source: ngpus
+      - id: best_focus_channel
+        source: best_focus_channel
+      - id: nuclei_channel
+        source: nuclei_channel
+      - id: membrane_channel
+        source: membrane_channel
+      - id: block_size
+        source: block_size
+      - id: overlap
+        source: overlap
     run: steps/initiate_pipeline.cwl
     out:
       - id: cytokit_config
