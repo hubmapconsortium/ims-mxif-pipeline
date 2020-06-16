@@ -8,6 +8,10 @@ requirements:
 baseCommand: ["python", "/opt/ims_pipeline/bin/initiate_pipeline.py"]
 
 inputs:
+  experiment_name:
+    type: string
+    inputBinding:
+      prefix: "--experiment_name"
   cytokit_container_path:
     type: File
     inputBinding:

@@ -5,6 +5,8 @@ class: Workflow
 
 
 inputs:
+  - id: experiment_name
+    type: string
   - id: cytokit_container_path
     type: File
   - id: cytokit_data_dir

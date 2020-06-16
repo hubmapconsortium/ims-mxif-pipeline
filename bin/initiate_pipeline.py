@@ -23,7 +23,7 @@ def create_base_dirs(out_dir: str):
     return dir_paths
 
 
-def main(cytokit_container_path, cytokit_data_dir, mxif_dataset_dir_path,
+def main(epxeriment_name, cytokit_container_path, cytokit_data_dir, mxif_dataset_dir_path,
          multichannel_ims_ometiff_positive_path, multichannel_ims_ometiff_negative_path,
          ngpus, best_focus_channel, nuclei_channel, membrane_channel, block_size, overlap):
     __location__ = osp.realpath(osp.join(os.getcwd(), osp.dirname(__file__)))
@@ -31,7 +31,8 @@ def main(cytokit_container_path, cytokit_data_dir, mxif_dataset_dir_path,
     base_pipeline_dir = os.getcwd()
     dir_paths = create_base_dirs(base_pipeline_dir)
 
-    submission = dict(cytokit_container_path=cytokit_container_path,
+    submission = dict(epxeriment_name=epxeriment_name,
+                      cytokit_container_path=cytokit_container_path,
                       cytokit_data_dir=cytokit_data_dir,
                       mxif_dataset_dir_path=mxif_dataset_dir_path,
                       multichannel_ims_ometiff_positive_path=multichannel_ims_ometiff_positive_path,
@@ -63,6 +64,7 @@ def main(cytokit_container_path, cytokit_data_dir, mxif_dataset_dir_path,
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--experiment_name', type=str, help='experiment name will be used for naming files and folders')
     parser.add_argument('--cytokit_container_path', type=str, help='path to cytokit container')
     parser.add_argument('--cytokit_data_dir', type=str, help='path to cytokit data dir')
     parser.add_argument('--mxif_dataset_dir_path', type=str,
@@ -80,6 +82,6 @@ if __name__ == '__main__':
     parser.add_argument('--overlap', type=str, help='ize of overlap for one edge (each image has 4 overlapping edges)')
     args = parser.parse_args()
 
-    main(args.cytokit_container_path, args.cytokit_data_dir, args.mxif_dataset_dir_path,
+    main(args.experiment_name, args.cytokit_container_path, args.cytokit_data_dir, args.mxif_dataset_dir_path,
          args.multichannel_ims_ometiff_positive_path, args.multichannel_ims_ometiff_negative_path,
          args.ngpus, args.best_focus_channel, args.nuclei_channel, args.membrane_channel, args.block_size, args.overlap)
