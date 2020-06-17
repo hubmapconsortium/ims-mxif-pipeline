@@ -81,7 +81,7 @@ def generate_slicer_meta(img_name: str, plane_shape: tuple, block_size: int, ove
 
 
 def extract_from_raw_ome_meta(path: str, ncycles: int, nregions: int):
-    with open(path, 'r') as f:
+    with open(path, 'r', encoding='utf-8') as f:
         ome_meta = f.read()
 
     xml = strip_namespace(ome_meta)

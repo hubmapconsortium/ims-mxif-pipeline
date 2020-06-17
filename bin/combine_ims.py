@@ -71,7 +71,9 @@ def main(ims_pos_path: str, ims_neg_path: str, ims_combined_out_path: str):
         del combined_xml.find('Image').find('Pixels').attrib['PhysicalSizeYUnit']
 
     combined_xml_str = ET.tostring(combined_xml, method='xml', encoding='utf-8', xml_declaration=True)
-    description = combined_xml_str.decode('ascii')
+    xml_declaration = '<?xml version="1.0" encoding="UTF-8"?>'
+    description = combined_xml_str.decode('ascii', errors='backslashreplace')
+    description = xml_declaration + description
 
     with tif.TiffWriter(ims_combined_out_path, bigtiff=True) as TW:
         for i in range(0, num_pos_ch):

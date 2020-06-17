@@ -76,8 +76,10 @@ def main(mxif_data_paths: list, mxif_combined_out_path: str):
     if 'PhysicalSizeYUnit' in pixel_attribs:
         del combined_xml.find('Image').find('Pixels').attrib['PhysicalSizeYUnit']
 
-    combined_xml_str = ET.tostring(combined_xml, method='xml', encoding='utf-8', xml_declaration=True)
-    description = combined_xml_str.decode('ascii')
+    combined_xml_str = ET.tostring(combined_xml, method='xml', encoding='utf-8')
+    xml_declaration = '<?xml version="1.0" encoding="UTF-8"?>'
+    description = combined_xml_str.decode('ascii', errors='backslashreplace')
+    description = xml_declaration + description
 
     with tif.TiffWriter(mxif_combined_out_path, bigtiff=True) as TW:
         for dataset in range(0, len(mxif_data_paths)):
