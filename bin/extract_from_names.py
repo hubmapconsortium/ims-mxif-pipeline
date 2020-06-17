@@ -32,10 +32,11 @@ def get_file_locations(base_dir: str):
 
 
 def extract_cycle_and_region_from_name(dirname: str):
+    region = 1
     if 'reg' in dirname:
-        region = int(re.search(r'reg(\d+)', dirname, re.IGNORECASE).groups()[0])
-    else:
-        region = 1
+        match = re.search(r'reg(\d+)', dirname, re.IGNORECASE)
+        if match is not None:
+            region = int(match.groups()[0])
     cycle = int(re.search(r'cyc(\d+)', dirname, re.IGNORECASE).groups()[0])
 
     return cycle, region

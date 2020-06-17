@@ -22,6 +22,10 @@ RUN python3 -m pip install --no-cache-dir setuptools
 RUN python3 -m pip install --no-cache-dir -r /tmp/requirements.txt \
     && rm -rf /root/.cache/pip
 
+# set alias python3 to python
+RUN ln -s /usr/bin/python3 /usr/bin/python && \
+    ln -s /usr/bin/pip3 /usr/bin/pip
+
 # copy python scripts and download metadata extractor
 COPY bin /opt/ims_pipeline/bin
 RUN wget --quiet https://github.com/VasylVaskivskyi/extract_meta/releases/latest/download/extract_meta.jar -P /opt/ims_pipeline/bin/extract_meta
