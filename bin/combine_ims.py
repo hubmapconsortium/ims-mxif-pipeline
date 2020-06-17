@@ -70,7 +70,7 @@ def main(ims_pos_path: str, ims_neg_path: str, ims_combined_out_path: str):
     if 'PhysicalSizeYUnit' in pixel_attribs:
         del combined_xml.find('Image').find('Pixels').attrib['PhysicalSizeYUnit']
 
-    combined_xml_str = ET.tostring(combined_xml, method='xml', encoding='utf-8', xml_declaration=True)
+    combined_xml_str = ET.tostring(combined_xml, method='xml', encoding='utf-8')
     xml_declaration = '<?xml version="1.0" encoding="UTF-8"?>'
     description = combined_xml_str.decode('ascii', errors='backslashreplace')
     description = xml_declaration + description
