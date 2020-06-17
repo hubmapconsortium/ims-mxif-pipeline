@@ -8,13 +8,17 @@ requirements:
 baseCommand: ["python", "/opt/ims_pipeline/bin/run_combine_ims.py"]
 
 inputs:
-  pipeline_config:
+  multichannel_ims_ometiff_positive_path:
     type: File
     inputBinding:
-      prefix: "--pipeline_config"
+      prefix: "--multichannel_ims_ometiff_positive_path"
+  multichannel_ims_ometiff_negative_path:
+    type: File
+    inputBinding:
+      prefix: "--multichannel_ims_ometiff_negative_path"
 
 outputs:
   combined_ims:
     type: File
     outputBinding:
-      glob: "./pipeline_output/*_ims_combined_multilayer.ome.tiff"
+      glob: "ims_combined_multilayer.ome.tiff"

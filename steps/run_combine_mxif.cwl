@@ -8,13 +8,13 @@ requirements:
 baseCommand: ["python", "/opt/ims_pipeline/bin/run_combine_mxif.py"]
 
 inputs:
-  pipeline_config:
-    type: File
+  mxif_dataset_dir_path:
+    type: Directory
     inputBinding:
-      prefix: "--pipeline_config"
+      prefix: "--mxif_dataset_dir_path"
 
 outputs:
   combined_mxif:
     type: File
     outputBinding:
-      glob: "./pipeline_output/*_mxif_combined_multilayer.ome.tiff"
+      glob: "mxif_combined_multilayer.ome.tiff"

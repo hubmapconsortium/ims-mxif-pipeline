@@ -1,28 +1,35 @@
 import argparse
 import os
 import os.path as osp
+import re
+
 import yaml
 
 import combine_mxif
+from extract_from_names import extract_cycle_info_from_names
 
 
-def main(pipeline_config: str):
-    with open(pipeline_config, 'r') as s:
-        config = yaml.safe_load(s)
+def main(mxif_dataset_dir_path: str):
+    per_cycle_info = extract_cycle_info_from_names(mxif_dataset_dir_path)
 
-    pipeline_meta = config['pipeline_meta']
-    mxif_data_paths = pipeline_meta['mxif_data_paths']
-    mxif_combined_out_path = pipeline_meta['mxif_combined_out_path']
+    mxif_data_paths = []
+    total_cycles = list(per_cycle_info.keys())
+    for c in total_cycles:
+        this_cycle_info = per_cycle_info[c]
+        regions = list(this_cycle_info.keys())
+        for r in regions:
+            proc_img_path = this_cycle_info[r]['proc_path']
+            mxif_data_paths.append(proc_img_path)
 
-    if not osp.exists('pipeline_output'):
-        os.makedirs('pipeline_output')
+    mxif_combined_out_path = 'mxif_combined_multilayer.ome.tiff'
 
     combine_mxif.main(mxif_data_paths, mxif_combined_out_path)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--pipeline_config', type=str, help='path to pipeline config')
+    parser.add_argument('--mxif_dataset_dir_path', type=str,
+                        help='path to directory with MxIF datasets. Contains two directories: processedMicroscopy, rawMicroscopy')
     args = parser.parse_args()
 
-    main(args.pipeline_config)
+    main(args.mxif_dataset_dir_path)

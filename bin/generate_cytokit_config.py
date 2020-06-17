@@ -34,7 +34,7 @@ def generate_processor_meta(acquisition_meta: dict, submission: dict):
     num_z_planes = acquisition_meta['num_z_planes']
     ngpus = submission['ngpus']
     best_focus_channel = submission['best_focus_channel']
-    drift_compensation_channel = submission['drift_compensation_channel']
+    #drift_compensation_channel = submission['drift_compensation_channel']
     nuclei_channel = submission['nuclei_channel']
     run_drift_comp = False
     drift_compensation = {}

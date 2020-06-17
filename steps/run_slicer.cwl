@@ -12,9 +12,21 @@ inputs:
     type: File
     inputBinding:
       prefix: "--pipeline_config"
+  mxif_dataset_dir_path:
+    type: Directory
+    inputBinding:
+      prefix: "--mxif_dataset_dir_path"
+  block_size:
+    type: int
+    inputBinding:
+      prefix: "--block_size"
+  overlap:
+    type: int
+    inputBinding:
+      prefix: "--overlap"
 
 outputs:
   slicer_out_dir:
     type: Directory
     outputBinding:
-      glob: "images/Cyc?_reg?"
+      glob: "tiles"

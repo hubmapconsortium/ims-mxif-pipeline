@@ -68,6 +68,12 @@ steps:
     in:
       - id: pipeline_config
         source: initiate_pipeline/pipeline_config
+      - id: mxif_dataset_dir_path
+        source: mxif_dataset_dir_path
+      - id: block_size
+        source: block_size
+      - id: overlap
+        source: overlap
     run: steps/run_slicer.cwl
     out:
       - id: slicer_out_dir
@@ -96,16 +102,18 @@ steps:
 
   - id: run_combine_ims
     in:
-      - id: pipeline_config
-        source: initiate_pipeline/pipeline_config
+      - id: multichannel_ims_ometiff_positive_path
+        source: multichannel_ims_ometiff_positive_path
+      - id: multichannel_ims_ometiff_negative_path
+        source: multichannel_ims_ometiff_negative_path
     run: steps/run_combine_ims.cwl
     out:
       - id: combined_ims
 
   - id: run_combine_mxif
     in:
-      - id: pipeline_config
-        source: initiate_pipeline/pipeline_config
+      - id: mxif_dataset_dir_path
+        source: mxif_dataset_dir_path
     run: steps/run_combine_mxif.cwl
     out:
       - id: combined_mxif

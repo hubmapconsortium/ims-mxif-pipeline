@@ -22,4 +22,4 @@ outputs:
   stitched_mask:
     type: File
     outputBinding:
-      glob: "./pipeline_output/*_segmentation_mask_stitched.ome.tiff"
+      glob: "segmentation_mask_stitched.ome.tiff"

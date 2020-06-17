@@ -23,15 +23,15 @@ def create_base_dirs(out_dir: str):
     return dir_paths
 
 
-def main(epxeriment_name, cytokit_container_path, cytokit_data_dir, mxif_dataset_dir_path,
+def main(experiment_name, cytokit_container_path, cytokit_data_dir, mxif_dataset_dir_path,
          multichannel_ims_ometiff_positive_path, multichannel_ims_ometiff_negative_path,
          ngpus, best_focus_channel, nuclei_channel, membrane_channel, block_size, overlap):
     __location__ = osp.realpath(osp.join(os.getcwd(), osp.dirname(__file__)))
 
-    base_pipeline_dir = os.getcwd()
+    base_pipeline_dir = '.'
     dir_paths = create_base_dirs(base_pipeline_dir)
 
-    submission = dict(epxeriment_name=epxeriment_name,
+    submission = dict(experiment_name=experiment_name,
                       cytokit_container_path=cytokit_container_path,
                       cytokit_data_dir=cytokit_data_dir,
                       mxif_dataset_dir_path=mxif_dataset_dir_path,

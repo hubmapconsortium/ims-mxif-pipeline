@@ -11,6 +11,7 @@ import yaml
 import tifffile as tif
 
 from extract_meta import run_extract_meta
+from extract_from_names import extract_cycle_info_from_names
 
 
 def strip_namespace(xmlstr: str):
@@ -19,65 +20,6 @@ def strip_namespace(xmlstr: str):
         _, _, el.tag = el.tag.rpartition('}')
     root = it.root
     return root
-
-
-def get_proc_micro_file_location(dataset_dir):
-    allowed_extensions = ('.tif', '.tiff')
-    file_list = [fn for fn in os.listdir(dataset_dir) if fn.endswith(allowed_extensions)]
-    if file_list == []:
-        raise ValueError("There are no TIFF files in the directory " + dataset_dir)
-    else:
-        # TODO replace with better solution
-        return osp.join(dataset_dir, file_list[0])
-
-
-def get_file_locations(base_dir: str):
-    proc_micro_path = osp.join(base_dir, 'processedMicroscopy')
-    raw_micro_path = osp.join(base_dir, 'rawMicroscopy')
-
-    proc_micro_dirs = os.listdir(proc_micro_path)
-    raw_micro_files = os.listdir(raw_micro_path)
-    # current naming patterns:
-    # processedMicroscopy/VAN0003-LK-32-22-MxIF_cyc1_images/VAN0003-LK-32-22-MxIF_cyc1_registered.ome.tiff
-    # rawMicroscopy/VAN0003-LK-32-22-MxIF_cyc1_unregistered.czi
-    full_path_proc_micro_dirs = [osp.join(base_dir, 'processedMicroscopy', path) for path in proc_micro_dirs if
-                                 'images' in path]
-    full_path_proc_micro_files = [get_proc_micro_file_location(path) for path in full_path_proc_micro_dirs]
-
-    full_path_raw_micro_files = [osp.join(base_dir, 'rawMicroscopy', path) for path in raw_micro_files if
-                                 'meta' not in path]
-
-    return full_path_proc_micro_files, full_path_raw_micro_files
-
-
-def extract_cycle_and_region_from_name(dataset_dir: str):
-    cycle = int(re.search(r'_cyc(\d+)_', dataset_dir).groups()[0])
-    #  TODO replace region
-    region = 1
-    return cycle, region
-
-
-def arrange_by_cycle(proc_micro_files, raw_micro_files):
-    per_cycle_info = dict()
-    for fn in proc_micro_files:
-        cycle, region = extract_cycle_and_region_from_name(fn)
-        proc_path = {'proc_path': fn}
-        if cycle in per_cycle_info:
-            per_cycle_info[cycle].update({region: proc_path})
-        else:
-            per_cycle_info[cycle] = {region: proc_path}
-
-    for fn in raw_micro_files:
-        cycle, region = extract_cycle_and_region_from_name(fn)
-        raw_path = {'raw_path': fn}
-        if cycle in per_cycle_info:
-            if region in per_cycle_info[cycle]:
-                per_cycle_info[cycle][region].update(raw_path)
-            else:
-                continue
-        else:
-            continue
-    return per_cycle_info
 
 
 def get_img_info(img_path, block_size):
@@ -205,10 +147,9 @@ def main(submission: dict, base_pipeline_dir: str, pipeline_output_dir:str, pipe
 
     block_size = submission['block_size']
     overlap = submission['overlap']
-    base_input_dir = submission['mxif_dataset_dir_path']
+    mxif_dir = submission['mxif_dataset_dir_path']
 
-    proc_micro_files, raw_micro_files = get_file_locations(base_input_dir)
-    per_cycle_info = arrange_by_cycle(proc_micro_files, raw_micro_files)
+    per_cycle_info = extract_cycle_info_from_names(mxif_dir)
 
     slicer_meta_path_list = []
     extracted_ome_meta_path_list = []
