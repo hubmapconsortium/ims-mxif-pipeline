@@ -151,8 +151,6 @@ def main(submission: dict, base_pipeline_dir: str, pipeline_output_dir:str, pipe
 
     per_cycle_info = extract_cycle_info_from_names(mxif_dir)
 
-    slicer_meta_path_list = []
-    extracted_ome_meta_path_list = []
     pooled_channel_names = []
     # TODO replace for next version with for loop for each cycle and region
     # cycles = per_cycle_info.keys()
@@ -191,9 +189,6 @@ def main(submission: dict, base_pipeline_dir: str, pipeline_output_dir:str, pipe
         pooled_channel_names.append(global_ch_name)
 
     # # pipeline meta
-    slicer_meta_path_list.append(slicer_meta_path)
-    extracted_ome_meta_path_list.append(extracted_ome_meta_path)
-
     # outside of loop
 
     # make general slicer meta using first cycle information

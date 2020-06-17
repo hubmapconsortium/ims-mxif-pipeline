@@ -2,10 +2,7 @@ import copy
 import os
 import os.path as osp
 import argparse
-from string import Template
 
-import yaml
-import json
 import numpy as np
 import tifffile as tif
 import dask
@@ -166,11 +163,6 @@ def split_tiff(in_path: str, out_dir: str, block_size: int, nblocks: int, overla
                 dask.compute(*task, scheduler='threads')
                 p += 1
 
-        x_nblocks = plane_shape[-1] // block_size if plane_shape[-1] % block_size == 0 else (plane_shape[
-                                                                                                 -1] // block_size) + 1
-        y_nblocks = plane_shape[-2] // block_size if plane_shape[-2] % block_size == 0 else (plane_shape[
-                                                                                                 -2] // block_size) + 1
-
     # split image by block size
     elif block_size == 0:
         p = 0
@@ -187,45 +179,6 @@ def split_tiff(in_path: str, out_dir: str, block_size: int, nblocks: int, overla
                                                           photometric='minisblack'))
                 dask.compute(*task, scheduler='threads')
                 p += 1
-        x_nblocks = nblocks
-        y_nblocks = nblocks
-
-    block_shape = this_plane_split[0].shape
-    block_shape_no_overlap = (block_shape[-2] - overlap * 2, block_shape[-1] - overlap * 2)
-
-    nblocks_info = dict(x=x_nblocks, y=y_nblocks)
-    block_shape_info = dict(x=block_shape[-1], y=block_shape[-2])
-    block_shape_no_overlap_info = dict(x=block_shape_no_overlap[-1], y=block_shape_no_overlap[-2])
-    original_img_shape_info = dict(x=plane_shape[-1], y=plane_shape[-2])
-    new_image_shape_info = dict(x=block_shape[-1] * x_nblocks, y=block_shape[-2] * y_nblocks)
-    overlap_info = dict(x=overlap * 2, y=overlap * 2)
-
-    padding = dict(left=0, right=0, top=0, bottom=0)
-    padding["right"] = block_shape_no_overlap[-1] - (plane_shape[-1] % block_shape_no_overlap[-1])
-    padding["bottom"] = block_shape_no_overlap[-2] - (plane_shape[-2] % block_shape_no_overlap[-2])
-    img_name = osp.basename(in_path)
-
-    slicer_description = {'image_name': img_name,
-                          'original_image_shape': original_img_shape_info,
-                          'new_image_shape': new_image_shape_info,
-                          'block_shape': block_shape_info,
-                          'block_shape_no_overlap': block_shape_no_overlap_info,
-                          'nblocks': nblocks_info,
-                          'overlap': overlap_info,
-                          'padding': padding,
-                          'tiling_mode': 'grid',
-                          'cycle': cycle,
-                          'region': region
-                          }
-
-    if meta is not None:
-        with open(osp.join(out_dir, 'ome_meta.xml'), 'w') as f:
-            f.write(meta)
-
-    print(yaml.dump(slicer_description, default_flow_style=False, indent=4, sort_keys=False))
-
-    with open(osp.join(out_dir, 'description.yaml'), 'w') as s:
-        yaml.safe_dump(slicer_description, stream=s, default_flow_style=False, indent=4, sort_keys=False)
 
 
 def main(i: str = None, o: str = None, s: int = None, n: int = None, v: int = None,
