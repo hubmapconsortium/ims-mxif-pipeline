@@ -4,7 +4,8 @@ cwlVersion: v1.0
 class: CommandLineTool
 requirements:
   DockerRequirement:
-    dockerPull: vaskivskyi/ims:latest
+    dockerPull: hubmap/cytokit:latest
+  DockerGpuRequirement: {}
 baseCommand: ["python", "/opt/ims_pipeline/bin/run_cytokit.py"]
 
 inputs:

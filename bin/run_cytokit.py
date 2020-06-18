@@ -21,25 +21,15 @@ def main(pipeline_config: str, cytokit_config: str, slicer_out_dir: str):
         os.makedirs('cytokit_output')
     shutil.copy(cytokit_config, '.')
 
-    cytokit_run_cmd = ('singularity exec --nv ' +
-                       '-B {cytokit_data_dir}:/lab/data/ ' +
-                       '-B {input_dir}:/lab/slices/ ' +
-                       '-B {output_dir}:/lab/output/ ' +
-                       '{cytokit_container_path} ' +
-                       'bash -c ' +
-                       '"source {conda_init_path} && ' +
-                       'conda activate cytokit && ' +
-                       'cytokit processor run_all ' +
-                       '--data-dir /lab/slices/ --config-path {cytokit_config_path} --output-dir /lab/output/" ')
+    quote = ''' " '''
+    conda_init = '''__conda_setup=\"$(\'/opt/conda/bin/conda\' \'shell.bash\' \'hook\' 2> /dev/null)\"; if [ $? -eq 0 ]; then eval \"$__conda_setup\"; else if [ -f \"/opt/conda/etc/profile.d/conda.sh\" ]; then . "/opt/conda/etc/profile.d/conda.sh\"; else export PATH=\"/opt/conda/bin:$PATH\"; fi fi; unset __conda_setup; export PYTHONPATH=/lab/repos/cytokit/python/pipeline '''
+    conda_activate = ''' && conda activate cytokit '''
+    run_cytokit = ''' && cytokit processor run_all '''
+    run_param = ''' --data-dir {input_dir} --config-path {cytokit_config_path} --output-dir {output_dir} '''
+    run_param.format(input_dir=slicer_out_dir, output_dir='cytokit_output', cytokit_config_path='cytokit_config.yaml')
+    cytokit_run_cmd = quote + conda_init + conda_activate + run_cytokit + run_param + quote
 
-    run_cytokit = cytokit_run_cmd.format(cytokit_data_dir=meta['cytokit_data_dir'],
-                                         input_dir=slicer_out_dir,
-                                         output_dir='cytokit_output',
-                                         cytokit_container_path=meta['cytokit_container_path'],
-                                         conda_init_path=meta['conda_init_path'],
-                                         cytokit_config_path='cytokit_config.yaml')
-
-    res = subprocess.run(run_cytokit, shell=True, check=True)
+    res = subprocess.run(cytokit_run_cmd, shell=True, check=True)
 
     """
     res.returncode
