@@ -1,32 +1,51 @@
 #!/usr/bin/env cwl-runner
 
-cwlVersion: v1.0
 class: CommandLineTool
-requirements:
+cwlVersion: v1.0
+baseCommand: ["sh", "conda_init.sh"]
+
+hints:
   DockerRequirement:
     dockerPull: hubmap/cytokit:latest
+    dockerOutputDirectory: "/lab/cytokit_output"
   DockerGpuRequirement: {}
-baseCommand: ["python", "/opt/ims_pipeline/bin/run_cytokit.py"]
+
+  InitialWorkDirRequirement:
+    listing:
+
+      - entryname: conda_init.sh
+        entry: |-
+          __conda_setup="\$('/opt/conda/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+          if [ \$? -eq 0 ]; then
+             eval "\$__conda_setup"
+          else
+             if [ -f "/opt/conda/etc/profile.d/conda.sh" ]; then
+                 . "/opt/conda/etc/profile.d/conda.sh"
+             else
+                 export PATH="/opt/conda/bin:$PATH"
+             fi
+          fi
+          unset __conda_setup
+
+          export PYTHONPATH=/lab/repos/cytokit/python/pipeline
+          conda activate cytokit
+
+          cytokit processor run_all --data-dir $(inputs.slicer_out_dir.path) --config-path $(inputs.cytokit_config.path) --output-dir /lab/cytokit_output
+
 
 inputs:
   pipeline_config:
     type: File
-    inputBinding:
-      prefix: "--pipeline_config"
 
   cytokit_config:
     type: File
-    inputBinding:
-      prefix: "--cytokit_config"
 
   slicer_out_dir:
     type: Directory
-    inputBinding:
-      prefix: "--slicer_out_dir"
 
 
 outputs:
   cytokit_out_dir:
     type: Directory
     outputBinding:
-      glob: cytokit_output
+      glob: /lab/cytokit_output
