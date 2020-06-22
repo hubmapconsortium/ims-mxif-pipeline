@@ -26,7 +26,10 @@ def main(pipeline_config: str, mxif_dataset_dir_path: str, block_size: int, over
     if not osp.exists(output_dir):
         os.makedirs(output_dir)
 
-    selected_channels = [0]
+    per_cycle_channel_names = ome_meta['per_cycle_channel_names']
+    nuclei_channel = int(per_cycle_channel_names[0].lstrip('CH')) - 1
+    selected_channels = [nuclei_channel]
+
     slicer.main(in_path, output_dir, block_size, 0, overlap, cycle, region,
                 int(num_z_planes), int(num_channels), selected_channels)
 

@@ -45,7 +45,7 @@ def stitch_plane(path_list: List[str], page: int,
     block_slice = [slice(None), slice(None)]
     previous_tile_max = 0
     tile_additions = np.zeros((y_nblocks, x_nblocks), dtype=dtype)
-    print('x blocks:', x_nblocks, 'y blocks:', y_nblocks)
+    print('n blocks x,y:', x_nblocks, y_nblocks)
     print('plane shape x,y:', big_image_shape[::-1])
     n = 0
     for i in range(0, y_nblocks):

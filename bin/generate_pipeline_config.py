@@ -182,10 +182,10 @@ def main(submission: dict, base_pipeline_dir: str,  pipeline_config_path: str):
     save_extracted_ome_meta(extracted_ome_meta_path, extracted_ome_meta)
 
     # find id of nuclei channel
-    nuclei_channel_id = 0
+    nuclei_channel_id = 1
     for i, ch_name in enumerate(extracted_ome_meta['channel_names']):
         if ch_name == submission['nuclei_channel']:
-            nuclei_channel_id = i
+            nuclei_channel_id = i + 1
     per_cycle_ch_name = 'CH' + str(nuclei_channel_id)
 
     # collect paths of all mxif datasets
