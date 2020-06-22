@@ -4,10 +4,7 @@ import os
 import os.path as osp
 
 
-def main(i: str, o: str, m: str = ''):
-    input_file = i
-    output_file = o
-    mapping = m
+def main(input_file: str, output_file: str, mapping: str = ''):
     __location__ = osp.realpath(osp.join(os.getcwd(), osp.dirname(__file__)))
     jar_path = osp.join(__location__, 'extract_meta.jar')
 

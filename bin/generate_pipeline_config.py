@@ -141,9 +141,7 @@ def save_extracted_ome_meta(output_path: str, meta: dict):
         yaml.safe_dump(meta, stream=s, default_flow_style=False, indent=4, sort_keys=False)
 
 
-def main(submission: dict, base_pipeline_dir: str, pipeline_output_dir:str, pipeline_config_path: str,
-         cytokit_container_path: str, cytokit_output_dir: str, cytokit_data_dir: str, conda_init_path: str,
-         cytokit_config_path: str):
+def main(submission: dict, base_pipeline_dir: str,  pipeline_config_path: str):
 
     block_size = submission['block_size']
     overlap = submission['overlap']
@@ -158,8 +156,10 @@ def main(submission: dict, base_pipeline_dir: str, pipeline_output_dir:str, pipe
     # nregions = max([max(list(per_cycle_info[c].keys())) for c in cycles])
     ncycles = 1
     nregions = 1
-    cycle = 1
-    region = 1
+    # select first cycle and region
+    cycle = min(list(per_cycle_info.keys()))
+    region = min(list(per_cycle_info[cycle].keys()))
+
     this_cycle_info = per_cycle_info[cycle]
     proc_img_path = this_cycle_info[region]['proc_path']
     raw_img_path = this_cycle_info[region]['raw_path']
@@ -168,7 +168,6 @@ def main(submission: dict, base_pipeline_dir: str, pipeline_output_dir:str, pipe
                                        overlap, x_nblocks, y_nblocks, cycle, region)
 
     meta_output_dir = osp.join(base_pipeline_dir, 'meta', 'Cyc' + str(cycle) + '_reg' + str(region))
-    images_output_dir = osp.join(base_pipeline_dir, 'images', 'Cyc' + str(cycle) + '_reg' + str(region))
 
     if not osp.exists(meta_output_dir):
         os.makedirs(meta_output_dir)
@@ -182,18 +181,14 @@ def main(submission: dict, base_pipeline_dir: str, pipeline_output_dir:str, pipe
     extracted_ome_meta = extract_from_raw_ome_meta(raw_ome_meta_path, ncycles, nregions)
     save_extracted_ome_meta(extracted_ome_meta_path, extracted_ome_meta)
 
-    for ch in extracted_ome_meta['channel_names']:
-        ch_name = ch.replace(' ', '_')
-        global_ch_name = 'Cyc{cycle}_reg{region}_{ch_name}'.format(cycle=str(cycle), region=str(region),
-                                                                   ch_name=ch_name)
-        pooled_channel_names.append(global_ch_name)
+    # find id of nuclei channel
+    nuclei_channel_id = 0
+    for i, ch_name in enumerate(extracted_ome_meta['channel_names']):
+        if ch_name == submission['nuclei_channel']:
+            nuclei_channel_id = i
+    per_cycle_ch_name = 'CH' + str(nuclei_channel_id)
 
-    # # pipeline meta
-    # outside of loop
-
-    # make general slicer meta using first cycle information
-    # TODO change for next release
-
+    # collect paths of all mxif datasets
     mxif_data_paths = []
     total_cycles = list(per_cycle_info.keys())
     for c in total_cycles:
@@ -203,45 +198,21 @@ def main(submission: dict, base_pipeline_dir: str, pipeline_output_dir:str, pipe
             proc_img_path = this_cycle_info[r]['proc_path']
             mxif_data_paths.append(proc_img_path)
 
+    # create general slicer meta
     remove_keys = ['image_name', 'cycle', 'region']
     general_slicer_meta = {key: val for key, val in slicer_meta.items() if key not in remove_keys}
 
+    # create general ome meta
     general_ome_meta = extracted_ome_meta
-    general_ome_meta['channel_names'] = [submission['nuclei_channel']]  # replace with pooled_channel_names
-    general_ome_meta['per_cycle_channel_names'] = ['CH1']
+    general_ome_meta['channel_names'] = [submission['nuclei_channel']]
+    general_ome_meta['per_cycle_channel_names'] = [per_cycle_ch_name]
     general_ome_meta['emission_wavelengths'] = [extracted_ome_meta['emission_wavelengths'][0]]  # take first value and put in the list
 
-    experiment_name = submission['experiment_name']
-    cytokit_output_masks = osp.join(cytokit_output_dir, 'cytometry', 'tile')
-    stitcher_out_path = osp.join(pipeline_output_dir, experiment_name + '_segmentation_mask_stitched.ome.tiff')
-    ims_combined_out_path = osp.join(pipeline_output_dir, experiment_name + '_ims_combined_multilayer.ome.tiff')
-    mxif_combined_out_path = osp.join(pipeline_output_dir, experiment_name + '_mxif_combined_multilayer.ome.tiff')
-
-    pipeline_meta = {'num_cycles': ncycles,
-                     'num_regions': nregions,
-                     'pipeline_output_dir': pipeline_output_dir,
-                     'slicer_in_path': proc_img_path,
-                     'slicer_out_path': images_output_dir,
-                     'slicer_meta_path': slicer_meta_path,
-                     'extracted_ome_meta_path': extracted_ome_meta_path,
-                     'stitcher_in_path': cytokit_output_masks,
-                     'stitcher_out_path': stitcher_out_path,
-                     'cytokit_output_dir': cytokit_output_dir,
-                     'cytokit_data_dir': cytokit_data_dir,
-                     'cytokit_container_path': cytokit_container_path,
-                     'conda_init_path': conda_init_path,
-                     'cytokit_config_path': cytokit_config_path,
-                     'ims_combined_out_path': ims_combined_out_path,
-                     'mxif_data_paths': mxif_data_paths,
-                     'mxif_combined_out_path': mxif_combined_out_path
-                     }
-
+    # combine all metadata into pipeline config
     pipeline_config = dict()
-
     pipeline_config['submission'] = submission
     pipeline_config['ome_meta'] = general_ome_meta
     pipeline_config['slicer_meta'] = general_slicer_meta
-    pipeline_config['pipeline_meta'] = pipeline_meta
 
     with open(pipeline_config_path, 'w') as s:
         yaml.safe_dump(pipeline_config, stream=s, default_flow_style=False, indent=4, sort_keys=False)
@@ -251,15 +222,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--submission', type=yaml.safe_load, help='data from submission file')
     parser.add_argument('--base_pipeline_dir', type=str, help='base pipeline directory')
-    parser.add_argument('--pipeline_output_dir', type=str, help='directory to output pipeline results')
     parser.add_argument('--pipeline_config_path', type=str, help='path to output collected pipeline metadata')
-    parser.add_argument('--cytokit_container_path', type=str, help='path to cytokit container')
-    parser.add_argument('--cytokit_output_dir', type=str, help='path to cytokit output directory')
-    parser.add_argument('--cytokit_data_dir', type=str, help='path to cytokit data directory')
-    parser.add_argument('--conda_init_path', type=str, help='path to file that initiates conda shell')
-    parser.add_argument('--cytokit_config_path', type=str, help='path to cytokit config file')
+
     args = parser.parse_args()
 
-    main(args.submission, args.base_pipeline_dir, args.pipeline_output_dir, args.pipeline_config_path,
-         args.cytokit_container_path, args.cytokit_output_dir, args.cytokit_data_dir, args.conda_init_path,
-         args.cytokit_config_path)
+    main(args.submission, args.base_pipeline_dir,  args.pipeline_config_path)

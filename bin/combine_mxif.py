@@ -1,9 +1,7 @@
 import argparse
 import xml.etree.ElementTree as ET
 from io import StringIO
-import copy
 
-import yaml
 import tifffile as tif
 
 
@@ -92,7 +90,7 @@ def main(mxif_data_paths: list, mxif_combined_out_path: str):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--mxif_data_paths', type=str, nargs='+',
-                        help='spcae separated list of paths to MxIF OME-TIFF')
+                        help='space separated list of paths to MxIF OME-TIFF')
     parser.add_argument('--mxif_combined_out_path', type=str,
                         help='path to output combined MxIF images')
     args = parser.parse_args()

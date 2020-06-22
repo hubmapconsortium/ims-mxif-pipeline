@@ -7,10 +7,6 @@ class: Workflow
 inputs:
   - id: experiment_name
     type: string
-  - id: cytokit_container_path
-    type: File
-  - id: cytokit_data_dir
-    type: Directory
   - id: mxif_dataset_dir_path
     type: Directory
   - id: multichannel_ims_ometiff_positive_path
@@ -20,12 +16,8 @@ inputs:
 
   - id: ngpus
     type: int
-  - id: best_focus_channel
-    type: Any
   - id: nuclei_channel
     type: string
-  - id: membrane_channel
-    type: Any
   - id: block_size
     type: int
   - id: overlap
@@ -36,10 +28,6 @@ steps:
     in:
       - id: experiment_name
         source: experiment_name
-      - id: cytokit_container_path
-        source: cytokit_container_path
-      - id: cytokit_data_dir
-        source: cytokit_data_dir
       - id: mxif_dataset_dir_path
         source: mxif_dataset_dir_path
       - id: multichannel_ims_ometiff_positive_path
@@ -49,12 +37,8 @@ steps:
 
       - id: ngpus
         source: ngpus
-      - id: best_focus_channel
-        source: best_focus_channel
       - id: nuclei_channel
         source: nuclei_channel
-      - id: membrane_channel
-        source: membrane_channel
       - id: block_size
         source: block_size
       - id: overlap

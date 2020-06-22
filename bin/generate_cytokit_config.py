@@ -1,19 +1,7 @@
-import os
-import os.path as osp
-import re
 import datetime
 import argparse
 
-import xml.etree.ElementTree as ET
-import tifffile as tif
 import yaml
-
-
-def read_ome_meta(path: str):
-    with open(path, 'r') as s:
-        gathered_meta = yaml.safe_load(stream=s)
-
-    return gathered_meta
 
 
 def read_slicer_meta(slicer_meta: dict):
@@ -33,17 +21,17 @@ def generate_processor_meta(acquisition_meta: dict, submission: dict):
 
     num_z_planes = acquisition_meta['num_z_planes']
     ngpus = submission['ngpus']
-    best_focus_channel = submission['best_focus_channel']
-    #drift_compensation_channel = submission['drift_compensation_channel']
+    best_focus_channel = submission['nuclei_channel']
     nuclei_channel = submission['nuclei_channel']
     run_drift_comp = False
     drift_compensation = {}
 
+    # drift_compensation_channel = submission['drift_compensation_channel']
     # if drift_compensation_channel is not None:
     #     run_drift_comp = True
     #     drift_compensation = {'drift_compensation': {'channel': drift_compensation_channel}}
 
-    if num_z_planes > 1 and best_focus_channel.lower() != 'none':
+    if num_z_planes > 1:
         run_best_focus = True
         best_focus = {'best_focus': {'channel':  best_focus_channel}}
         z_plane = 'best'
@@ -85,20 +73,19 @@ def generate_processor_meta(acquisition_meta: dict, submission: dict):
     return processor_meta
 
 
-def main(collected_meta_path: str, cytokit_config_path: str):
+def main(pipeline_config_path: str, cytokit_config_path: str):
+    with open(pipeline_config_path, 'r') as s:
+        config = yaml.safe_load(s)
 
-    with open(collected_meta_path, 'r') as s:
-        collected_meta = yaml.safe_load(s)
-
-    slicer_meta = read_slicer_meta(collected_meta['slicer_meta'])
-    ome_meta = collected_meta['ome_meta']
+    slicer_meta = read_slicer_meta(config['slicer_meta'])
+    ome_meta = config['ome_meta']
 
     # same as acquisition_meta but without key - acquisition
     acq_meta = dict()
     acq_meta.update(slicer_meta)
     acq_meta.update(ome_meta)
 
-    submission = collected_meta['submission']
+    submission = config['submission']
 
     head_meta = {"name": submission['experiment_name'],
                  "date": str(datetime.datetime.now()),
@@ -118,9 +105,9 @@ def main(collected_meta_path: str, cytokit_config_path: str):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--collected_meta_path', type=str, help='path to collected metadata')
+    parser.add_argument('--pipeline_config_path', type=str, help='path to collected metadata')
     parser.add_argument('--cytokit_config_path', type=str, help='path to output cytokit config file')
 
     args = parser.parse_args()
 
-    main(args.collected_meta_path, args.cytokit_config_path)
+    main(args.pipeline_config_path, args.cytokit_config_path)

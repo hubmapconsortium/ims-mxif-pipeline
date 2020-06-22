@@ -12,14 +12,6 @@ inputs:
     type: string
     inputBinding:
       prefix: "--experiment_name"
-  cytokit_container_path:
-    type: File
-    inputBinding:
-      prefix: "--cytokit_container_path"
-  cytokit_data_dir:
-    type: Directory
-    inputBinding:
-      prefix: "--cytokit_data_dir"
   mxif_dataset_dir_path:
     type: Directory
     inputBinding:
@@ -37,18 +29,10 @@ inputs:
     type: int
     inputBinding:
       prefix: "--ngpus"
-  best_focus_channel:
-    type: Any
-    inputBinding:
-      prefix: "--best_focus_channel"
   nuclei_channel:
     type: string
     inputBinding:
       prefix: "--nuclei_channel"
-  membrane_channel:
-    type: Any
-    inputBinding:
-      prefix: "--membrane_channel"
   block_size:
     type: int
     inputBinding:

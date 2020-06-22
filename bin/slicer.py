@@ -136,23 +136,18 @@ def split_by_nblocks(arr: np.ndarray, region: int, zplane: int, channel: int, x_
 
 
 def split_tiff(in_path: str, out_dir: str, block_size: int, nblocks: int, overlap: int,
-               cycle: int, region: int, nzplanes: int, nchannels: int):
+               region: int, nzplanes: int, nchannels: int, selected_channels: list):
     with tif.TiffFile(in_path) as TF:
         npages = len(TF.pages)
-        plane_shape = TF.series[0].shape
-        try:
-            meta = TF.ome_metadata
-        except AttributeError:
-            meta = None
 
     # split image by number of blocks
     if nblocks == 0:
-        p = 0
-        for c in range(0, nchannels):
+        for c in selected_channels:
             for z in range(0, nzplanes):
-                print('page', p + 1, '/', npages)
+                page = c * nzplanes + z
+                print('page', page + 1, '/', npages)
                 this_plane_split, this_plane_img_names = split_by_size(
-                    tif.imread(in_path, key=p), region, zplane=z, channel=c, block_w=block_size, block_h=block_size,
+                    tif.imread(in_path, key=page), region, zplane=z, channel=c, block_w=block_size, block_h=block_size,
                     overlap=overlap
                 )
                 task = []
@@ -161,16 +156,15 @@ def split_tiff(in_path: str, out_dir: str, block_size: int, nblocks: int, overla
                                                           photometric='minisblack'))
 
                 dask.compute(*task, scheduler='threads')
-                p += 1
 
     # split image by block size
     elif block_size == 0:
-        p = 0
-        for c in range(0, nchannels):
+        for c in selected_channels:
             for z in range(0, nzplanes):
-                print('page', p + 1, '/', npages)
+                page = c * nzplanes + z
+                print('page', page + 1, '/', npages)
                 this_plane_split, this_plane_img_names = split_by_nblocks(
-                    tif.imread(in_path, key=p), region, zplane=0, channel=c, x_nblocks=nblocks, y_nblocks=nblocks,
+                    tif.imread(in_path, key=page), region, zplane=0, channel=c, x_nblocks=nblocks, y_nblocks=nblocks,
                     overlap=overlap
                 )
                 task = []
@@ -178,20 +172,11 @@ def split_tiff(in_path: str, out_dir: str, block_size: int, nblocks: int, overla
                     task.append(dask.delayed(tif.imwrite)(osp.join(out_dir, this_plane_img_names[i]), img,
                                                           photometric='minisblack'))
                 dask.compute(*task, scheduler='threads')
-                p += 1
 
 
-def main(i: str = None, o: str = None, s: int = None, n: int = None, v: int = None,
-         c: int = None, r: int = None, nz: int = None, nc: int = None):
-    in_path = i
-    out_dir = o
-    nblocks = n
-    block_size = s
-    overlap = v
-    cycle = c
-    region = r
-    nzplanes = nz
-    nchannels = nc
+def main(in_path: str = None, out_dir: str = None, block_size: int = None, nblocks: int = None, overlap: int = None,
+         cycle: int = None, region: int = None, nzplanes: int = None, nchannels: int = None, selected_channels: list = None):
+
     # Cyc{cycle:d}_reg{region:d}/{region:d}_{tile:05d}_Z{z:03d}_CH{channel:d}.tif
     out_dir = osp.join(out_dir, 'Cyc{cycle}_reg{region}'.format(cycle=cycle, region=region))
     if not in_path.endswith(('tif', 'tiff')):
@@ -206,7 +191,12 @@ def main(i: str = None, o: str = None, s: int = None, n: int = None, v: int = No
     if nblocks == 0 and block_size == 0:
         raise ValueError('One of the parameters -s or -n must be non zero')
 
-    split_tiff(in_path, out_dir, block_size, nblocks, overlap, cycle, region, nzplanes, nchannels)
+    if selected_channels is None:
+        selected_channels = list(range(0, nchannels))
+    else:
+        selected_channels = [ch_id for ch_id in selected_channels if ch_id < nchannels]
+
+    split_tiff(in_path, out_dir, block_size, nblocks, overlap, region, nzplanes, nchannels, selected_channels)
 
 
 if __name__ == '__main__':
@@ -222,8 +212,9 @@ if __name__ == '__main__':
     parser.add_argument('--region', type=int, default=1, help='region number, default 1')
     parser.add_argument('--nzplanes', type=int, default=1, help='number of z-planes, default 1')
     parser.add_argument('--nchannels', type=int, default=1, help='number of channels, default 1')
+    parser.add_argument('--selected_channels', type=int, nargs='+', default=None,
+                        help="space separated ids of channels you want to slice, e.g. 0 1 3, default all")
 
     args = parser.parse_args()
-    main(i=args.i, o=args.o, s=args.s, n=args.n, v=args.v, c=args.cycle, r=args.region, nz=args.nzplanes,
-         nc=args.nchannels)
-
+    main(args.i, args.o, args.s, args.n, args.v, args.cycle, args.region,
+         args.nzplanes, args.nchannels, args.selected_channels)

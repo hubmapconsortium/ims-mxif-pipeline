@@ -231,11 +231,7 @@ def remap_values(big_image: Image, remap_dict: dict,
     return big_image
 
 
-def main(i: str, o: str, v: int, p: str):
-    img_dir = i
-    out_path = o
-    overlap = v
-    padding_str = p
+def main(img_dir: str, out_path: str, overlap: int, padding_str: str):
 
     padding_int = [int(i) for i in padding_str.split(',')]
     padding = {"left": padding_int[0], "right": padding_int[1], "top": padding_int[2], "bottom": padding_int[3]}
