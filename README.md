@@ -9,7 +9,18 @@ and some running parameters. Example of submission file is `sample_submission.ya
 ### Output
 
 Output can be found either in the directory where this pipeline was invoked or 
-ata the location of cwltool argument `--outdir`. 
+at the location of `cwltool` argument `--outdir`. 
+
+- `segmentation_mask_stitched.ome.tiff`
+   Multichannel segmentation mask produced by Cytokit using nuclei channel. 
+- `ims_combined_multilayer.ome.tiff` \
+   All IMS channels combined together in one OME-TIFF
+- `mxif_combined_multilayer.ome.tiff` \
+   All MxIF channels combined together in one OME-TIFF
+- `cytokit_config.yaml` \
+   Configuration file that contain parameters for running Cytokit.
+- `pipeline_config.yaml` \
+   Runtime parameters that were used in the pipeline.
 
 
 ### Requirements
@@ -21,4 +32,4 @@ Docker containers:
  - vaskivskyi/ims:latest
  - hubmap/cytokit:latest
 
-If not present locally will be downloaded by cwltool.
+If not present locally will be downloaded by `cwltool`.
