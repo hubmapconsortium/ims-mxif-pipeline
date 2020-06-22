@@ -29,7 +29,7 @@ at the location of `cwltool` argument `--outdir`.
 https://github.com/hubmapconsortium/cwltool/tree/docker-gpu
 
 Docker containers:
- - vaskivskyi/ims:latest
+ - hubmap/ims-mxif-pipeline:latest
  - hubmap/cytokit:latest
 
 If not present locally will be downloaded by `cwltool`.

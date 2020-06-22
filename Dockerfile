@@ -2,7 +2,7 @@ FROM ubuntu:bionic
 
 LABEL version="1.0"
 LABEL maintainer="Vasyl Vaskivskyi <vaskivskyi.v@gmail.com>"
-LABEL description="HUBMAP imaging mass spectrometry pipeline."
+LABEL description="HUBMAP IMS - MxIF pipeline."
 
 RUN apt-get -qq update \
     && apt-get -qq install --no-install-recommends --yes \

@@ -45,7 +45,7 @@ def stitch_plane(path_list: List[str], page: int,
     block_slice = [slice(None), slice(None)]
     previous_tile_max = 0
     tile_additions = np.zeros((y_nblocks, x_nblocks), dtype=dtype)
-    print('n blocks x,y:', x_nblocks, y_nblocks)
+    print('n blocks x,y:', (x_nblocks, y_nblocks))
     print('plane shape x,y:', big_image_shape[::-1])
     n = 0
     for i in range(0, y_nblocks):
@@ -268,7 +268,7 @@ def main(img_dir: str, out_path: str, overlap: int, padding_str: str):
 
     with tif.TiffWriter(out_path, bigtiff=True) as TW:
         for p in range(0, npages):
-            print('page', p)
+            print('\npage', p)
             print('stitching')
             plane, tile_additions = stitch_plane(path_list, p, x_nblocks, y_nblocks, block_shape, dtype, overlap, padding, remap_dict)
             if remap_dict is not None:

@@ -1,10 +1,10 @@
 #!/usr/bin/env cwl-runner
 
-cwlVersion: v1.0
+cwlVersion: v1.1
 class: CommandLineTool
 requirements:
   DockerRequirement:
-    dockerPull: vaskivskyi/ims:latest
+    dockerPull: hubmap/ims-mxif-pipeline:latest
 baseCommand: ["python", "/opt/ims_pipeline/bin/initiate_pipeline.py"]
 
 inputs:
