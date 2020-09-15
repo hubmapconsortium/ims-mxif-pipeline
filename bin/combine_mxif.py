@@ -1,6 +1,7 @@
 import argparse
 import xml.etree.ElementTree as ET
 from io import StringIO
+import copy
 
 import tifffile as tif
 
@@ -37,54 +38,103 @@ def get_necessary_meta(path):
     return meta
 
 
-def main(mxif_data_paths: list, mxif_combined_out_path: str):
+def filter_redundant_nuclei_channels(mxif_data_paths, nuclei_channel_id_list):
+    metadata_per_cycle = []
+    for i, path in enumerate(mxif_data_paths):
+        meta = get_necessary_meta(path)
+        redundant_nuclei_channel_id = nuclei_channel_id_list[i]
+        if redundant_nuclei_channel_id != -1:
+            del meta['channels'][redundant_nuclei_channel_id]
+            meta['nchannels'] -= 1
+        metadata_per_cycle.append(meta)
+    return metadata_per_cycle
 
-    combined_xml = strip_namespace(read_ome_meta(mxif_data_paths[0]))
 
-    for child in combined_xml.find('Image').find('Pixels').getchildren():
-        combined_xml.find('Image').find('Pixels').remove(child)
+def create_new_xml_from_combined_metadata(old_xml, metadata_per_cycle):
+    # set proper ome attributes tags
+    combined_xml = copy.deepcopy(old_xml)
+    proper_ome_attribs = {'xmlns': 'http://www.openmicroscopy.org/Schemas/OME/2016-06',
+                          'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+                          'xsi:schemaLocation': 'http://www.openmicroscopy.org/Schemas/OME/2016-06 http://www.openmicroscopy.org/Schemas/OME/2016-06/ome.xsd'}
+    combined_xml.attrib.clear()
+
+    for attr, val in proper_ome_attribs.items():
+        combined_xml.set(attr, val)
+    for child_node in list(combined_xml.find('Image').find('Pixels')):
+        combined_xml.find('Image').find('Pixels').remove(child_node)
+
+    tiff_data = ET.Element('TiffData', dict(FirstC="0", FirstT="0", FirstZ="0", IFD="0", PlaneCount="1"))
 
     combined_meta = []
-    prev_num_ch = 0
-    for path in mxif_data_paths:
-        meta = get_necessary_meta(path)
-        for i in range(0, meta['nchannels']):
-            new_id = str(prev_num_ch + i)
-            meta['channels'][i].set('ID', 'Channel:0:' + new_id)
-            # meta['tiffdata'][i].set('FisrtC', new_id)
-            # meta['tiffdata'][i].set('IFD', new_id)
-        combined_meta.append(meta)
-        prev_num_ch += meta['nchannels']
+    num_channels = 0
+    for meta in metadata_per_cycle:
+        meta['tiffdata'] = []
+        for j in range(0, meta['nchannels']):
+            new_id = str(num_channels)
+            meta['channels'][j].set('ID', 'Channel:0:' + new_id)
 
-    total_channels = str(prev_num_ch)
+            new_tiff_data = copy.deepcopy(tiff_data)
+            new_tiff_data.set('FirstC', new_id)
+            new_tiff_data.set('IFD', new_id)
+            meta['tiffdata'].append(new_tiff_data)
+
+            num_channels += 1
+        combined_meta.append(meta)
+
+    total_channels = str(num_channels)
     combined_xml.find('Image').find('Pixels').set('SizeC', total_channels)
 
     for dataset in combined_meta:
         for c in dataset['channels']:
             combined_xml.find('Image').find('Pixels').append(c)
-    #
-    # for dataset in combined_meta:
-    #     for t in dataset['tiffdata']:
-    #         combined_xml.find('Image').find('Pixels').append(t)
 
-    # these attributes contain symbol that is cannot be encoded with ascii. ascii encoding required by tifffile
-    pixel_attribs = combined_xml.find('Image').find('Pixels').attrib
-    if 'PhysicalSizeXUnit' in pixel_attribs:
-        del combined_xml.find('Image').find('Pixels').attrib['PhysicalSizeXUnit']
-    if 'PhysicalSizeYUnit' in pixel_attribs:
-        del combined_xml.find('Image').find('Pixels').attrib['PhysicalSizeYUnit']
+    for dataset in combined_meta:
+        for t in dataset['tiffdata']:
+            combined_xml.find('Image').find('Pixels').append(t)
+
+    # PhysicalSizeUnit may contain symbol that cannot be encoded with ascii. ascii encoding is required by tifffile
+    del combined_xml.find('Image').find('Pixels').attrib['PhysicalSizeXUnit']
+    del combined_xml.find('Image').find('Pixels').attrib['PhysicalSizeYUnit']
 
     combined_xml_str = ET.tostring(combined_xml, method='xml', encoding='utf-8')
     xml_declaration = '<?xml version="1.0" encoding="UTF-8"?>'
-    description = combined_xml_str.decode('ascii', errors='backslashreplace')
-    description = xml_declaration + description
+    final_combined_xml_str = combined_xml_str.decode('ascii', errors='ignore')
+    final_combined_xml_str = xml_declaration + final_combined_xml_str
+
+    return final_combined_xml_str, combined_meta
+
+
+def get_values_from_sorted_dict(dictionary: dict):
+    sorted_keys = sorted(dictionary.keys())
+    values_from_sorted_dict = list()
+    for k in sorted_keys:
+        values_from_sorted_dict.append(dictionary[k])
+    return values_from_sorted_dict
+
+
+def get_number_of_tiff_pages(file_path):
+    with tif.TiffFile(file_path) as TF:
+        npages = len(TF.pages)
+    return npages
+
+
+def main(pipeline_config: dict, mxif_data_paths: list, mxif_combined_out_path: str):
+
+    nuclei_channel_id_per_cycle = pipeline_config['submission']['nuclei_channel_id_per_cycle']
+    nuclei_channel_id_list = get_values_from_sorted_dict(nuclei_channel_id_per_cycle)
+    nuclei_channel_id_list[0] = -1  # to keep nuclei channel in first cycle
+
+    first_cycle_xml = strip_namespace(read_ome_meta(mxif_data_paths[0]))
+    metadata_per_cycle = filter_redundant_nuclei_channels(mxif_data_paths, nuclei_channel_id_list)
+    combined_xml, combined_meta = create_new_xml_from_combined_metadata(first_cycle_xml, metadata_per_cycle)
 
     with tif.TiffWriter(mxif_combined_out_path, bigtiff=True) as TW:
-        for dataset in range(0, len(mxif_data_paths)):
-            npages = combined_meta[dataset]['nchannels']
+        for i, data_path in enumerate(mxif_data_paths):
+            npages = get_number_of_tiff_pages(data_path)
+            redundant_nuclei_channel_id = nuclei_channel_id_list[i]
             for page in range(0, npages):
-                TW.save(tif.imread(mxif_data_paths[dataset], key=page),
-                        photometric='minisblack', description=description)
+                if page != redundant_nuclei_channel_id:
+                    TW.save(tif.imread(data_path, key=page), photometric='minisblack', description=combined_xml)
 
 
 if __name__ == '__main__':
