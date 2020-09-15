@@ -4,7 +4,7 @@ cwlVersion: v1.1
 class: CommandLineTool
 requirements:
   DockerRequirement:
-    dockerPull: hubmap/ims-mxif-pipeline:1.0
+    dockerPull: hubmap/ims-mxif-pipeline:1.1
 baseCommand: ["python", "/opt/ims_pipeline/bin/run_slicer.py"]
 
 inputs:
