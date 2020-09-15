@@ -26,8 +26,61 @@ def get_all_channels_and_tiffdata(xml):
     pixels = xml.find('Image').find('Pixels')
     nchannels = int(pixels.get('SizeC'))
     channels = pixels.findall('Channel')
-    tiffdata = pixels.findall('TiffData')
-    return nchannels, channels, tiffdata
+    return nchannels, channels
+
+
+def create_new_xml_from_combined_metadata(positive_xml, negative_xml):
+    num_pos_ch, pos_ch = get_all_channels_and_tiffdata(positive_xml)
+    num_neg_ch, neg_ch = get_all_channels_and_tiffdata(negative_xml)
+    combined_xml = copy.copy(positive_xml)
+
+    proper_ome_attribs = {'xmlns': 'http://www.openmicroscopy.org/Schemas/OME/2016-06',
+                          'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+                          'xsi:schemaLocation': 'http://www.openmicroscopy.org/Schemas/OME/2016-06 http://www.openmicroscopy.org/Schemas/OME/2016-06/ome.xsd'}
+    combined_xml.attrib.clear()
+    for attr, val in proper_ome_attribs.items():
+        combined_xml.set(attr, val)
+
+    for child_node in list(combined_xml.find('Image').find('Pixels')):
+        combined_xml.find('Image').find('Pixels').remove(child_node)
+
+    total_channels = num_pos_ch + num_neg_ch
+    combined_xml.find('Image').find('Pixels').set('SizeC', str(total_channels))
+
+    for i in range(0, len(neg_ch)):
+        new_id = str(num_pos_ch + i)
+        neg_ch[i].set('ID', 'Channel:0:' + new_id)
+
+    # combine positive and negative images
+    pos_ch.extend(neg_ch)
+
+    for c in pos_ch:
+        combined_xml.find('Image').find('Pixels').append(c)
+
+    # create TiffData
+    tiff_data = ET.Element('TiffData', dict(FirstC="0", FirstT="0", FirstZ="0", IFD="0", PlaneCount="1"))
+    tiff_data_list = []
+    for ch_id in range(0, total_channels):
+        new_id = str(ch_id)
+        new_tiff_data = copy.deepcopy(tiff_data)
+        new_tiff_data.set('FirstC', new_id)
+        new_tiff_data.set('IFD', new_id)
+        tiff_data_list.append(new_tiff_data)
+
+    # add tiff data to the combined meta
+    for t in tiff_data_list:
+        combined_xml.find('Image').find('Pixels').append(t)
+
+    # PhysicalSizeUnit may contain symbol that cannot be encoded with ascii. ascii encoding is required by tifffile
+    del combined_xml.find('Image').find('Pixels').attrib['PhysicalSizeXUnit']
+    del combined_xml.find('Image').find('Pixels').attrib['PhysicalSizeYUnit']
+
+    combined_xml_str = ET.tostring(combined_xml, method='xml', encoding='utf-8')
+    xml_declaration = '<?xml version="1.0" encoding="UTF-8"?>'
+    final_combined_xml_str = combined_xml_str.decode('ascii', errors='ignore')
+    final_combined_xml_str = xml_declaration + final_combined_xml_str
+
+    return final_combined_xml_str, num_pos_ch, num_neg_ch
 
 
 def main(ims_pos_path: str, ims_neg_path: str, ims_combined_out_path: str):
@@ -37,49 +90,13 @@ def main(ims_pos_path: str, ims_neg_path: str, ims_combined_out_path: str):
     pos_xml = strip_namespace(pos_xml_str)
     neg_xml = strip_namespace(neg_xml_str)
 
-    num_pos_ch, pos_ch, pos_tiff = get_all_channels_and_tiffdata(pos_xml)
-    num_neg_ch, neg_ch, neg_tiff = get_all_channels_and_tiffdata(neg_xml)
-
-    combined_xml = copy.copy(pos_xml)
-
-    for child in combined_xml.find('Image').find('Pixels').getchildren():
-        combined_xml.find('Image').find('Pixels').remove(child)
-
-    total_channels = str(num_pos_ch + num_neg_ch)
-    combined_xml.find('Image').find('Pixels').set('SizeC', total_channels)
-
-    for i in range(0, len(neg_ch)):
-        new_id = str(num_pos_ch + i)
-        neg_ch[i].set('ID', 'Channel:0:' + new_id)
-        neg_tiff[i].set('FisrtC', new_id)
-        neg_tiff[i].set('IFD', new_id)
-
-    # combine positive and negative channels and tiffdata
-    pos_ch.extend(neg_ch)
-    pos_tiff.extend(neg_tiff)
-
-    for c in pos_ch:
-        combined_xml.find('Image').find('Pixels').append(c)
-    for t in pos_tiff:
-        combined_xml.find('Image').find('Pixels').append(t)
-
-    # these attributes contain symbol that is cannot be encoded with ascii. ascii encoding required by tifffile
-    pixel_attribs = combined_xml.find('Image').find('Pixels').attrib
-    if 'PhysicalSizeXUnit' in pixel_attribs:
-        del combined_xml.find('Image').find('Pixels').attrib['PhysicalSizeXUnit']
-    if 'PhysicalSizeYUnit' in pixel_attribs:
-        del combined_xml.find('Image').find('Pixels').attrib['PhysicalSizeYUnit']
-
-    combined_xml_str = ET.tostring(combined_xml, method='xml', encoding='utf-8')
-    xml_declaration = '<?xml version="1.0" encoding="UTF-8"?>'
-    description = combined_xml_str.decode('ascii', errors='backslashreplace')
-    description = xml_declaration + description
+    combined_xml, num_pos_ch, num_neg_ch = create_new_xml_from_combined_metadata(pos_xml, neg_xml)
 
     with tif.TiffWriter(ims_combined_out_path, bigtiff=True) as TW:
         for i in range(0, num_pos_ch):
-            TW.save(tif.imread(ims_pos_path, key=i), photometric='minisblack', description=description)
+            TW.save(tif.imread(ims_pos_path, key=i), photometric='minisblack', description=combined_xml)
         for i in range(0, num_neg_ch):
-            TW.save(tif.imread(ims_neg_path, key=i), photometric='minisblack', description=description)
+            TW.save(tif.imread(ims_neg_path, key=i), photometric='minisblack', description=combined_xml)
 
 
 if __name__ == '__main__':
