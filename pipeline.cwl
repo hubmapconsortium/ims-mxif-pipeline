@@ -3,106 +3,102 @@
 cwlVersion: v1.1
 class: Workflow
 
-
 inputs:
-  - id: experiment_name
+  experiment_name:
     type: string
-  - id: mxif_dataset_dir_path
+  mxif_dataset_dir_path:
     type: Directory
-  - id: multichannel_ims_ometiff_positive_path
+  multichannel_ims_ometiff_positive_path:
     type: File
-  - id: multichannel_ims_ometiff_negative_path
+  multichannel_ims_ometiff_negative_path:
     type: File
 
-  - id: ngpus
+  ngpus:
     type: int
-  - id: nuclei_channel
+    default: 1
+  nuclei_channel:
     type: string
-  - id: block_size
+    default: "DAPI"
+  block_size:
     type: int
-  - id: overlap
+    default: 1000
+  overlap:
     type: int
+    default: 20
 
 steps:
-  - id: initiate_pipeline
+  initiate_pipeline:
     in:
-      - id: experiment_name
+      experiment_name:
         source: experiment_name
-      - id: mxif_dataset_dir_path
+      mxif_dataset_dir_path:
         source: mxif_dataset_dir_path
-      - id: multichannel_ims_ometiff_positive_path
+      multichannel_ims_ometiff_positive_path:
         source: multichannel_ims_ometiff_positive_path
-      - id: multichannel_ims_ometiff_negative_path
+      multichannel_ims_ometiff_negative_path:
         source: multichannel_ims_ometiff_negative_path
 
-      - id: ngpus
+      ngpus:
         source: ngpus
-      - id: nuclei_channel
+      nuclei_channel:
         source: nuclei_channel
-      - id: block_size
+      block_size:
         source: block_size
-      - id: overlap
+      overlap:
         source: overlap
     run: steps/initiate_pipeline.cwl
-    out:
-      - id: cytokit_config
-      - id: pipeline_config
+    out: [cytokit_config, pipeline_config]
 
-  - id: run_slicer
+  run_slicer:
     in:
-      - id: pipeline_config
+      pipeline_config:
         source: initiate_pipeline/pipeline_config
-      - id: mxif_dataset_dir_path
+      mxif_dataset_dir_path:
         source: mxif_dataset_dir_path
-      - id: block_size
+      block_size:
         source: block_size
-      - id: overlap
+      overlap:
         source: overlap
     run: steps/run_slicer.cwl
-    out:
-      - id: slicer_out_dir
+    out: [slicer_out_dir]
 
-  - id: run_cytokit
+  run_cytokit:
     in:
-      - id: pipeline_config
+      pipeline_config:
         source: initiate_pipeline/pipeline_config
-      - id: cytokit_config
+      cytokit_config:
         source: initiate_pipeline/cytokit_config
-      - id: slicer_out_dir
+      slicer_out_dir:
         source: run_slicer/slicer_out_dir
     run: steps/run_cytokit.cwl
-    out:
-      - id: cytokit_out_dir
+    out: [cytokit_out_dir]
 
-  - id: run_stitcher
+  run_stitcher:
     in:
-      - id: pipeline_config
+      pipeline_config:
         source: initiate_pipeline/pipeline_config
-      - id: cytokit_out_dir
+      cytokit_out_dir:
         source: run_cytokit/cytokit_out_dir
     run: steps/run_stitcher.cwl
-    out:
-      - id: stitched_mask
+    out: [stitched_mask]
 
-  - id: run_combine_ims
+  run_combine_ims:
     in:
-      - id: multichannel_ims_ometiff_positive_path
+      multichannel_ims_ometiff_positive_path:
         source: multichannel_ims_ometiff_positive_path
-      - id: multichannel_ims_ometiff_negative_path
+      multichannel_ims_ometiff_negative_path:
         source: multichannel_ims_ometiff_negative_path
     run: steps/run_combine_ims.cwl
-    out:
-      - id: combined_ims
+    out: [combined_ims]
 
-  - id: run_combine_mxif
+  run_combine_mxif:
     in:
-      - id: mxif_dataset_dir_path
+      mxif_dataset_dir_path:
         source: mxif_dataset_dir_path
-      - id: pipeline_config
+      pipeline_config:
         source: initiate_pipeline/pipeline_config
     run: steps/run_combine_mxif.cwl
-    out:
-      - id: combined_mxif
+    out: [combined_mxif]
 
 
 outputs:
