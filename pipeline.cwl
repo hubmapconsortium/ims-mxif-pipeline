@@ -15,12 +15,16 @@ inputs:
 
   ngpus:
     type: int
+    default: 1
   nuclei_channel:
     type: string
+    default: "DAPI"
   block_size:
     type: int
+    default: 1000
   overlap:
     type: int
+    default: 20
 
 steps:
   initiate_pipeline:
