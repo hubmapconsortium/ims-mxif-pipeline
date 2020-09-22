@@ -2,11 +2,16 @@ import os
 import os.path as osp
 import argparse
 import shutil
+from typing import List
 
 import yaml
 
 import generate_pipeline_config
 import generate_cytokit_config
+
+
+def comma_separated_integers(s: str) -> List[int]:
+    return [int(i.strip()) for i in s.split(',')]
 
 
 def create_base_dirs(out_dir: str):
@@ -23,7 +28,7 @@ def create_base_dirs(out_dir: str):
 
 def main(experiment_name, mxif_dataset_dir_path,
          multichannel_ims_ometiff_positive_path, multichannel_ims_ometiff_negative_path,
-         ngpus, nuclei_channel, block_size, overlap):
+         gpus, nuclei_channel, block_size, overlap):
 
     __location__ = osp.realpath(osp.join(os.getcwd(), osp.dirname(__file__)))
 
@@ -34,7 +39,7 @@ def main(experiment_name, mxif_dataset_dir_path,
                       mxif_dataset_dir_path=mxif_dataset_dir_path,
                       multichannel_ims_ometiff_positive_path=multichannel_ims_ometiff_positive_path,
                       multichannel_ims_ometiff_negative_path=multichannel_ims_ometiff_negative_path,
-                      ngpus=ngpus,
+                      gpus=gpus,
                       nuclei_channel=nuclei_channel,
                       block_size=block_size,
                       overlap=overlap
@@ -55,7 +60,7 @@ if __name__ == '__main__':
                         help='path positive multichannel IMS OME-TIFF')
     parser.add_argument('--multichannel_ims_ometiff_negative_path', type=str,
                         help='path negative multichannel IMS OME-TIFF')
-    parser.add_argument('--ngpus', type=int, help='number of gpus to use')
+    parser.add_argument('--gpus', type=comma_separated_integers, help='ids of gpus to use for running cytokit')
     parser.add_argument('--nuclei_channel', type=str, help='Channel that will be used for nucleus segmentation')
     parser.add_argument('--block_size', type=int, help='size of one tile for image segmentation')
     parser.add_argument('--overlap', type=int, help='size of overlap for one edge (each image has 4 overlapping edges)')
@@ -63,4 +68,4 @@ if __name__ == '__main__':
 
     main(args.experiment_name, args.mxif_dataset_dir_path,
          args.multichannel_ims_ometiff_positive_path, args.multichannel_ims_ometiff_negative_path,
-         args.ngpus, args.nuclei_channel, args.block_size, args.overlap)
+         args.gpus, args.nuclei_channel, args.block_size, args.overlap)

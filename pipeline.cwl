@@ -13,9 +13,9 @@ inputs:
   multichannel_ims_ometiff_negative_path:
     type: File
 
-  ngpus:
-    type: int
-    default: 1
+  gpus:
+    type: string
+    default: "0"
   nuclei_channel:
     type: string
     default: "DAPI"
@@ -38,8 +38,8 @@ steps:
       multichannel_ims_ometiff_negative_path:
         source: multichannel_ims_ometiff_negative_path
 
-      ngpus:
-        source: ngpus
+      gpus:
+        source: gpus
       nuclei_channel:
         source: nuclei_channel
       block_size:

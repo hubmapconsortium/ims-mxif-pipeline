@@ -25,10 +25,10 @@ inputs:
     inputBinding:
       prefix: "--multichannel_ims_ometiff_negative_path"
 
-  ngpus:
-    type: int
+  gpus:
+    type: string
     inputBinding:
-      prefix: "--ngpus"
+      prefix: "--gpus"
   nuclei_channel:
     type: string
     inputBinding:

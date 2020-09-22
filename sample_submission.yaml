@@ -1,4 +1,4 @@
-#String, Experiment name will be used for naming files and folders
+#String, for tracking Cytokit metadata
 experiment_name: "VAN0001-RK"
 
 #String, Path to immuno-fluorescent data, directory should contain 2 directories processedMicroscopy and rawMicroscopy
@@ -17,8 +17,8 @@ multichannel_ims_ometiff_negative_path:
   path: "/path/to/ims_negmode.ome.tiff/"
 
 
-#Integer, Number of gpus to use
-ngpus: 2
+#String, comma separated ids of GPUs to use for running Cytokit
+gpus: "0,1"
 
 #String, Channel that will be used for nucleus segmentation
 nuclei_channel: "DAPI"
