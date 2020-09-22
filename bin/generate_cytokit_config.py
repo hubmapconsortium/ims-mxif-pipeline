@@ -20,7 +20,7 @@ def read_slicer_meta(slicer_meta: dict):
 def generate_processor_meta(acquisition_meta: dict, submission: dict):
 
     num_z_planes = acquisition_meta['num_z_planes']
-    ngpus = submission['ngpus']
+    gpus = submission['gpus']
     best_focus_channel = submission['nuclei_channel']
     nuclei_channel = submission['nuclei_channel']
     run_drift_comp = False
@@ -39,8 +39,6 @@ def generate_processor_meta(acquisition_meta: dict, submission: dict):
         run_best_focus = False
         best_focus = {}
         z_plane = 'all'
-
-    gpus = list(range(0, ngpus))
 
     processor_meta = {
         "processor": {
