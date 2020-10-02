@@ -3,13 +3,7 @@ import xml.etree.ElementTree as ET
 from io import StringIO
 import copy
 
-import numpy as np
 import tifffile as tif
-
-
-def replace_nans(arr: np.ndarray):
-    arr[np.isnan(arr)] = 0
-    return arr
 
 
 def read_ome_meta(path: str):
@@ -100,9 +94,9 @@ def main(ims_pos_path: str, ims_neg_path: str, ims_combined_out_path: str):
 
     with tif.TiffWriter(ims_combined_out_path, bigtiff=True) as TW:
         for i in range(0, num_pos_ch):
-            TW.save(replace_nans(tif.imread(ims_pos_path, key=i)), photometric='minisblack', description=combined_xml)
+            TW.save(tif.imread(ims_pos_path, key=i), photometric='minisblack', description=combined_xml)
         for i in range(0, num_neg_ch):
-            TW.save(replace_nans(tif.imread(ims_neg_path, key=i)), photometric='minisblack', description=combined_xml)
+            TW.save(tif.imread(ims_neg_path, key=i), photometric='minisblack', description=combined_xml)
 
 
 if __name__ == '__main__':
