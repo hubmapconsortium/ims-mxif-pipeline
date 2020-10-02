@@ -11,20 +11,21 @@ RUN apt-get -qq update \
     ca-certificates \
     curl \
     unzip \
-    python3 \
-    python3-pip \
     openjdk-8-jre \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt /tmp/
-RUN python3 -m pip install --no-cache-dir setuptools
-RUN python3 -m pip install --no-cache-dir -r /tmp/requirements.txt \
-    && rm -rf /root/.cache/pip
+RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/miniconda.sh \
+    && /bin/bash /tmp/miniconda.sh -b -p /opt/conda \
+    && rm /tmp/miniconda.sh
+ENV PATH /opt/conda/bin:$PATH
 
-# set alias python3 to python
-RUN ln -s /usr/bin/python3 /usr/bin/python && \
-    ln -s /usr/bin/pip3 /usr/bin/pip
+# update base environment from yaml file
+COPY environment.yml /tmp/
+RUN conda env update -f /tmp/environment.yml \
+    && echo "source activate base" > ~/.bashrc \
+    && conda clean --index-cache --tarballs --yes
+ENV PATH /opt/conda/envs/hubmap/bin:$PATH
 
 # copy python scripts and download metadata extractor
 COPY bin /opt/ims_pipeline/bin
