@@ -1,6 +1,5 @@
 import argparse
-import os
-import os.path as osp
+from pathlib import Path
 
 import yaml
 
@@ -12,14 +11,14 @@ def main(pipeline_config: str, cytokit_out_dir: str):
         config = yaml.safe_load(s)
     slicer_meta = config['slicer_meta']
 
-    tiles = osp.join(cytokit_out_dir, 'cytometry', 'tile')
+    tiles_dir = Path(cytokit_out_dir).joinpath('cytometry').joinpath('tile')
     overlap = int(slicer_meta['overlap']['x'] // 2)
     padding_vals = [str(val) for val in list(slicer_meta['padding'].values())]
     padding = ','.join(padding_vals)
 
-    stitcher_out_path = 'segmentation_mask_stitched.ome.tiff'
-
-    stitcher.main(tiles, stitcher_out_path, overlap, padding)
+    stitcher_out_path = Path('segmentation_mask_stitched.ome.tiff')
+    is_mask = True
+    stitcher.main(tiles_dir, stitcher_out_path, overlap, padding, is_mask)
 
 
 if __name__ == '__main__':
