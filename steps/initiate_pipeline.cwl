@@ -4,7 +4,7 @@ cwlVersion: v1.1
 class: CommandLineTool
 requirements:
   DockerRequirement:
-    dockerPull: hubmap/ims-mxif-pipeline:1.3
+    dockerPull: hubmap/ims-mxif-pipeline:1.4
 baseCommand: ["python", "/opt/ims_pipeline/bin/initiate_pipeline.py"]
 
 inputs:
