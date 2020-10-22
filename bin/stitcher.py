@@ -151,10 +151,10 @@ def stitch_plane(path_list: List[Path], page: int,
 
 def _find_overlapping_border_labels(img1: Image, img2: Image, overlap: int, mode: str) -> dict:
     if mode == 'horizontal':
-        img1_ov = img1[:, -overlap:]
+        img1_ov = img1[:, -overlap * 2: -overlap]
         img2_ov = img2[:, :overlap]
     elif mode == 'vertical':
-        img1_ov = img1[-overlap:, :]
+        img1_ov = img1[-overlap * 2: -overlap, :]
         img2_ov = img2[:overlap, :]
 
     nrows, ncols = img2_ov.shape
@@ -275,10 +275,6 @@ def remap_values(big_image: Image, remap_dict: dict,
                 modified_y = True
 
             if modified_x or modified_y:
-                big_image[tuple(this_block_slice)] = this_block
-            else:
-                this_tile_addition = tile_additions[i, j]
-                this_block[np.nonzero(this_block)] += this_tile_addition
                 big_image[tuple(this_block_slice)] = this_block
 
             n += 1
